@@ -169,7 +169,7 @@
 
                                     @foreach ($courses as $course)
                                         <li>
-                                            <a href="{{ route('module.show', $course->id) }}">
+                                            <a href="{{ route($lang . '.module.show', $course->id) }}">
 
                                                 <span class="sub-item">{{ $course->{'title_' . $lang} }}</span>
 
@@ -182,15 +182,15 @@
 
 
                         <li class="nav-item">
-                            <a href="{{ route('development') }}">
-                                <i class="fas fa-file"></i>
-                                <p>{{ $translations[$lang]['topics'] }}</p>
+                            <a href="{{ route($lang . '.tests') }}">
+                                <i class="fas fa-pen-square"></i>
+                                <p>{{ $translations[$lang]['tests'] }}</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('development') }}">
-                                <i class="fas fa-pen-square"></i>
-                                <p>{{ $translations[$lang]['tests'] }}</p>
+                                <i class="fas fa-file"></i>
+                                <p>{{ $translations[$lang]['topics'] }}</p>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -251,7 +251,7 @@
                                 E-Skola</h3>
                         </a>
                         <div class="">
-                            <form method="POST" action="{{ route('logout') }}">
+                            <form method="POST" action="{{ route($lang . '.logout') }}">
                                 @csrf
 
                                 <button type="submit" value=""

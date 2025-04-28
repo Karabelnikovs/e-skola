@@ -42,7 +42,7 @@
 
 
                         </p>
-                        <a href="{{ route('module.show', $course->id) }}" class="btn btn-primary btn-round">
+                        <a href="{{ route($lang . '.module.show', $course->id) }}" class="btn btn-primary btn-round">
                             {{ $translations[$lang]['button'] ?? 'Apskatīt moduli' }}
                         </a>
                     </div>

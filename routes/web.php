@@ -17,34 +17,34 @@ Route::get('/', [LoginController::class, 'home'])->name('home');
 $locales = config('locale.supported');
 foreach ($locales as $locale) {
     Route::prefix($locale)->middleware('web')->group(function () use ($locale) {
-        Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-        Route::post('/login', [LoginController::class, 'login'])->name('login');
-        Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+        Route::get('/login', [LoginController::class, 'showLoginForm'])->name($locale . '.login');
+        Route::post('/login', [LoginController::class, 'login'])->name($locale . '.login.post');
+        Route::post('/logout', [LoginController::class, 'logout'])->name($locale . '.logout');
 
-        Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
-        Route::post('/register', [RegisterController::class, 'register']);
+        Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name($locale . '.register');
+        Route::post('/register', [RegisterController::class, 'register'])->name($locale . '.register.post');
 
-        Route::middleware(['AuthCheck'])->group(function () {
-            Route::get('/', [CourseController::class, 'index'])->name('courses.index');
+        Route::middleware(['AuthCheck'])->group(function () use ($locale) {
+            Route::get('/', [CourseController::class, 'index'])->name($locale . '.courses.index');
+            Route::get('profile', [CourseController::class, 'profile'])->name($locale . '.profile');
 
-            Route::get('profile', [CourseController::class, 'profile'])->name('profile');
+            Route::get('module/{id}', [CourseController::class, 'module'])->name($locale . '.module.show');
+            Route::get('test/{id}', [TestController::class, 'show'])->name($locale . '.test.show');
+            Route::post('/test/submit/{id}', [TestController::class, 'submit'])->name($locale . '.test.submit');
+            Route::get('test/{id}/result', [TestController::class, 'result'])->name($locale . '.test.result');
+            Route::get('/tests', [TestController::class, 'tests'])->name($locale . '.tests');
 
-            Route::get('module/{id}', [CourseController::class, 'module'])->name('module.show');
-            Route::get('test/{id}', [TestController::class, 'show'])->name('test.show');
-            Route::post('/test/submit/{id}', [TestController::class, 'submit'])->name('test.submit');
-            Route::get('test/{id}/result', [TestController::class, 'result'])->name('test.result');
+            Route::get('attempts/{id}', [TestController::class, 'attempts'])->name($locale . '.attempts.view');
+            Route::get('attempt/{id}', [TestController::class, 'attempt'])->name($locale . '.attempt.view');
 
-            Route::get('topic/{id}', [TopicController::class, 'topic'])->name('topic.view');
+            Route::get('topic/{id}', [TopicController::class, 'topic'])->name($locale . '.topic.view');
 
-            Route::get('certificate/{id}', [CertificateController::class, 'certificate'])->name('certificate.show');
-            Route::get('certificates', [CertificateController::class, 'certificates'])->name('certificates');
+            Route::get('certificate/{id}', [CertificateController::class, 'certificate'])->name($locale . '.certificate.show');
+            Route::get('certificates', [CertificateController::class, 'certificates'])->name($locale . '.certificates');
 
-            Route::get('dictionaries', [CourseController::class, 'dictionaries'])->name('dictionaries.view');
-            Route::get('/dictionary/{id}', [CourseController::class, 'dictionary'])->name('dictionary.view');
-
-
+            Route::get('dictionaries', [CourseController::class, 'dictionaries'])->name($locale . '.dictionaries.view');
+            Route::get('/dictionary/{id}', [CourseController::class, 'dictionary'])->name($locale . '.dictionary.view');
         });
-
     });
 }
 
@@ -57,11 +57,10 @@ Route::middleware(['AdminCheck'])->group(function () {
     Route::delete('/admin/users/{user}', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
 
     Route::get('/topics', [AdminController::class, 'topics'])->name('topics');
-    Route::get('/tests', [AdminController::class, 'tests'])->name('tests');
     Route::get('/sequences', [AdminController::class, 'sequences'])->name('sequences');
 
     //modules
-    Route::get('/all-modules', [AdminController::class, 'all_modules'])->name('modules.all');
+    Route::get('/all-modules', [AdminController::class, 'all_modules'])->name('module.all');
     Route::get('/module/create', [AdminController::class, 'create'])->name('module.create');
     Route::post('/module/store', [AdminController::class, 'store'])->name('module.store');
     Route::get('/module/{id}', [AdminController::class, 'module'])->name('module');
@@ -93,6 +92,10 @@ Route::middleware(['AdminCheck'])->group(function () {
     Route::post('/translate', [AdminController::class, 'translateText'])->name('translate');
     Route::post('/upload-image', [AdminController::class, 'uploadImage'])->name('upload.image');
 
+    Route::get('tests/users-history', [AdminController::class, 'usersTests'])->name('tests.users');
+    Route::get('tests/history/{id}', [AdminController::class, 'testsHistory'])->name('tests.history');
+    Route::get('test/attempts/{id}/{userID}', [AdminController::class, 'attempts'])->name('test.attempts');
+    Route::get('test/attempt/{id}', [AdminController::class, 'attempt'])->name('test.attempt');
 });
 
 Route::get('/error', function () {

@@ -731,4 +731,114 @@ class AdminController extends Controller
         return redirect()->route('admin.users')->with('success', 'Lietotājs veiksmīgi izdzēsts!');
     }
 
+
+    public function usersTests()
+    {
+        $courses = DB::table('courses')->get();
+        $users = DB::table('users')->orderBy('created_at', 'desc')->get();
+        $title = 'Lietotāju testi';
+        return view('admin.tests.users', compact('title', 'users', 'courses'));
+    }
+
+    public function testsHistory($id)
+    {
+        $courses = DB::table('courses')->get();
+        $title = 'Lietotāja testi';
+        $user = DB::table('users')->where('id', $id)->first();
+        if (!$user) {
+            return redirect()->route('admin.users')->with('error', 'Lietotājs nav atrasts!');
+        }
+
+        $tests = DB::table('tests')
+            ->join('courses', 'tests.course_id', '=', 'courses.id')
+            ->select('tests.*', 'courses.title_en as course_title_en', 'courses.title_lv as course_title_lv', 'courses.title_ua as course_title_ua', 'courses.title_ru as course_title_ru')
+            ->orderBy('tests.order', 'asc')
+            ->get();
+
+        $tests->map(function ($test) use ($id) {
+            $hasPassed = DB::table('attempts')
+                ->where('test_id', $test->id)
+                ->where('user_id', $id)
+                ->where('passed', 1)
+                ->exists();
+            $test->passed = $hasPassed ? 1 : 0;
+        });
+        $tests->map(function ($test) use ($id) {
+            $test->attempts_count = DB::table('attempts')
+                ->where('test_id', $test->id)
+                ->where('user_id', $id)
+                ->count() ?? 0;
+        });
+
+        return view('admin.tests.tests', compact('tests', 'courses', 'title', 'user'));
+
+    }
+
+    public function attempts($id, $userID)
+    {
+        $courses = DB::table('courses')->get();
+        $title = 'Mēģinājumu vēsture';
+        $attempts = DB::table('attempts')
+            ->where('attempts.test_id', $id)
+            ->join('tests', 'attempts.test_id', '=', 'tests.id')
+            ->where('attempts.user_id', $userID)
+            ->select('attempts.*', 'tests.title_en as title_en', 'tests.title_lv as title_lv', 'tests.title_ua as title_ua', 'tests.title_ru as title_ru', 'tests.passing_score')
+            ->orderBy('attempts.created_at', 'desc')
+            ->get();
+
+        $question_count = DB::table('questions')
+            ->where('test_id', $id)
+            ->count();
+
+        return view('admin.tests.attempts', compact('attempts', 'courses', 'title', 'question_count', 'id', 'userID'));
+    }
+
+    public function attempt($id)
+    {
+        $title = 'Mēģinājums';
+        $courses = DB::table('courses')->get();
+
+        $attempt = DB::table('attempts')
+            ->where('attempts.id', $id)
+            ->join('tests', 'attempts.test_id', '=', 'tests.id')
+            ->select('attempts.*', 'tests.title_en as title_en', 'tests.title_lv as title_lv', 'tests.title_ua as title_ua', 'tests.title_ru as title_ru')
+            ->first();
+
+        if (!$attempt) {
+            return redirect()->back()->with('error', 'Sūtījums netika atrasts...');
+        }
+        $test_id = $attempt->test_id;
+        $question_count = DB::table('questions')
+            ->where('test_id', $test_id)
+            ->count();
+
+        $answers = DB::table('answers')
+            ->where('attempt_id', $id)
+            ->join('questions', 'answers.question_id', '=', 'questions.id')
+            ->select('answers.*', 'questions.question_en as question_en', 'questions.question_lv as question_lv', 'questions.question_uk as question_ua', 'questions.question_ru as question_ru', 'questions.options_en as options_en', 'questions.options_lv as options_lv', 'questions.options_ua as options_ua', 'questions.options_ru as options_ru', 'questions.correct_answer', 'questions.order')
+            ->orderBy('questions.order', 'asc')
+            ->get();
+        $answers->map(function ($answer) {
+
+            foreach (['options_en', 'options_lv', 'options_ua', 'options_ru'] as $field) {
+                if (isset($answer->$field)) {
+                    $decoded = json_decode($answer->$field, true);
+                    if (is_null($decoded)) {
+                        $decoded = explode(',', $answer->$field);
+                    }
+                    $answer->$field = $decoded;
+                }
+            }
+
+            $optionsField = 'options_lv';
+            $options = $answer->$optionsField ?? [];
+            $answer->correct_option = $options[$answer->correct_answer] ?? null;
+
+            return $answer;
+        });
+
+
+        return view('admin.tests.attempt', compact('attempt', 'courses', 'title', 'answers', 'test_id', 'question_count'));
+    }
+
 }

@@ -91,7 +91,7 @@
                             <div class="collapse" id="dashboard">
                                 <ul class="nav nav-collapse">
                                     <li>
-                                        <a href="{{ route('modules.all') }}">
+                                        <a href="{{ route('module.all') }}">
                                             <span class="sub-item">Visi moduļi </span>
                                         </a>
                                     </li>
@@ -127,15 +127,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('development') }}">
-                                <i class="fas fa-file"></i>
-                                <p>Tēmas</p>
+                            <a href="{{ route('tests.users') }}">
+                                <i class="fas fa-pen-square"></i>
+                                <p>Testi</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('development') }}">
-                                <i class="fas fa-pen-square"></i>
-                                <p>Testi</p>
+                                <i class="fas fa-file"></i>
+                                <p>Tēmas</p>
                             </a>
                         </li>
                         <li class="nav-item">

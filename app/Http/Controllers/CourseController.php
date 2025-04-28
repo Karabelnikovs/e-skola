@@ -5,13 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class CourseController extends Controller
 {
     public function index()
     {
+        $lang = Session::get('lang', 'lv');
         if (!auth()->check()) {
-            return redirect()->route('login');
+            return redirect()->route($lang . '.login');
         }
         $courses = Course::all();
         $title = 'Courses';
@@ -20,16 +22,17 @@ class CourseController extends Controller
 
     public function module($id)
     {
+        $lang = Session::get('lang', 'lv');
         $module = DB::table('courses')->where('id', $id)->first();
         if (!$module) {
-            return redirect()->route('courses.index')->with('error', 'Course not found');
+            return redirect()->route($lang . '.courses.index')->with('error', 'Course not found');
         }
 
         $tests = DB::table('tests')->where('course_id', $id)->orderBy('order')->get();
         $topics = DB::table('topics')->where('course_id', $id)->orderBy('order')->get();
         $dictionaries = DB::table('dictionaries')->where('course_id', $id)->orderBy('order')->get();
 
-        $lang = app()->getLocale();
+        $lang = Session::get('lang', 'lv');
 
         $items = $topics->map(function ($topic) use ($lang) {
             return ['type' => 'topic', 'id' => $topic->id, 'title' => $topic->{'title_' . $lang}, 'order' => $topic->order];
@@ -40,19 +43,20 @@ class CourseController extends Controller
         })))->sortBy('order');
 
         $courses = Course::all();
-        if (app()->getLocale() == 'ua') {
+        if (Session::get('lang', 'lv') == 'ua') {
             $title = $module->title_uk ?? $module->title_en;
         } else {
-            $title = $course->{'title_' . app()->getLocale()} ?? $module->title_en;
+            $title = $course->{'title_' . Session::get('lang', 'lv')} ?? $module->title_en;
         }
-        return view('courses.module', compact('module', 'title', 'courses', 'items'));
+        return view('.courses.module', compact('module', 'title', 'courses', 'items'));
     }
 
     public function dictionary($id)
     {
+        $lang = Session::get('lang', 'lv');
         $dictionary = DB::table('dictionaries')->where('id', $id)->first();
         if (!$dictionary) {
-            return redirect()->route('courses.index')->with('error', 'Vārdnīca netika atrasta...');
+            return redirect()->route($lang . '.courses.index')->with('error', 'Vārdnīca netika atrasta...');
         }
 
         $items = DB::table('translations')->where('dictionary_id', $id)->orderBy('order')->get();

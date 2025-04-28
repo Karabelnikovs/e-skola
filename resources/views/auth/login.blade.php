@@ -74,7 +74,7 @@
         </svg>
     </span>
     <div class="mt-4 bg-white shadow-md rounded-lg text-left">
-        <form method="POST" action="{{ route('login') }}"{{-- onsubmit="return validateForm()" --}}>
+        <form method="POST" action="{{ route($lang . '.login') }}"{{-- onsubmit="return validateForm()" --}}>
             @csrf
             <div class="h-2 bg-purple-400 rounded-t-md"></div>
             <div class="px-8 py-6">

@@ -3,16 +3,28 @@
 @section('content')
     @php
         $translations = [
-            'lv' => ['title' => 'Tests'],
-            'en' => ['title' => 'Test'],
-            'ru' => ['title' => 'Тест'],
-            'ua' => ['title' => 'Тест'],
+            'lv' => [
+                'title' => 'Tests',
+                'question' => 'Jautājums',
+            ],
+            'en' => [
+                'title' => 'Test',
+                'question' => 'Question',
+            ],
+            'ru' => [
+                'title' => 'Тест',
+                'question' => 'Вопрос',
+            ],
+            'ua' => [
+                'title' => 'Тест',
+                'question' => 'Питання',
+            ],
         ];
 
         $lang = Session::get('lang', 'lv');
     @endphp
     <div class="card-body">
-        <a href="{{ route('module.show', $course_id) }}" class="btn btn-label-info btn-round me-2 mb-3">
+        <a href="{{ route($lang . '.module.show', $course_id) }}" class="btn btn-label-info btn-round me-2 mb-3">
             <i class="fas fa-arrow-circle-left"></i> Atpakaļ
         </a>
         <h1>{{ $title }} | {{ $translations[$lang]['title'] ?? 'Tests' }}</h1>
@@ -22,11 +34,11 @@
                     <div class="card mb-3 question" data-question-id="{{ $question->id }}">
                         <div class="card-body">
                             @if ($lang == 'ua')
-                                <h5 class="card-title">Question {{ $loop->iteration }}:
+                                <h5 class="card-title">{{ $translations[$lang]['question'] }} {{ $loop->iteration }}:
                                     {{ $question->question_uk }}
                                 </h5>
                             @else
-                                <h5 class="card-title">Question {{ $loop->iteration }}:
+                                <h5 class="card-title">{{ $translations[$lang]['question'] }} {{ $loop->iteration }}:
                                     {{ $question->{'question_' . $lang} }}
                                 </h5>
                             @endif
@@ -136,7 +148,7 @@
                 .then(data => {
                     const percentage = ((data.score / numberOfQuestions) * 100).toFixed(1);
                     Swal.fire({
-                        title: data.passed ? 'Pareizi!' : 'Nepareizi!',
+                        title: data.passed ? 'Nokārtots!' : 'Nenokārtots!',
                         html: `Jūsu rezultāts: ${data.score}/${numberOfQuestions} (${percentage}%)<br>` +
                             (data.passed ? 'Apsveicam! Jūs nokārtojāt testu!' :
                                 'Jūs nenokārtojāt testu. Mēģiniet vēlreiz!'),

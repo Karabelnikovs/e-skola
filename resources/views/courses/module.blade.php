@@ -74,15 +74,15 @@
                         @endif)</h3>
                     <div class="ms-md-auto py-2 py-md-0">
                         @if ($item['type'] == 'topic')
-                            <a href="{{ route('topic.view', [$item['id']]) }}"
+                            <a href="{{ route($lang . '.topic.view', [$item['id']]) }}"
                                 class="btn btn-label-info btn-round me-2">{{ $translations[$lang]['view_theory'] }} <i
                                     class="fas fa-angle-right"></i></a>
                         @elseif ($item['type'] == 'test')
-                            <a href="{{ route('test.show', [$item['id']]) }}"
+                            <a href="{{ route($lang . '.test.show', [$item['id']]) }}"
                                 class="btn btn-label-info btn-round me-2">{{ $translations[$lang]['take_test'] }} <i
                                     class="fas fa-angle-right"></i></a>
                         @elseif ($item['type'] == 'dictionary')
-                            <a href="{{ route('dictionary.view', [$item['id']]) }}"
+                            <a href="{{ route($lang . '.dictionary.view', [$item['id']]) }}"
                                 class="btn btn-label-info btn-round me-2">{{ $translations[$lang]['view_dictionary'] }} <i
                                     class="fas fa-angle-right"></i></a>
                         @endif
