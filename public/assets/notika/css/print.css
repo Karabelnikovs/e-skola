@@ -1,0 +1,661 @@
+@page {
+    size: landscape;
+    margin: 2cm;
+}
+
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+
+/* ------- 2. General ------- */
+
+body {
+    font-size: 12px;
+    font-family: Tahoma, Arial, sans-serif;
+}
+
+a {
+    color: #636363;
+    text-decoration: underline;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+p {
+    color: #636363;
+    margin-bottom: 15px;
+    line-height: 18px;
+}
+
+b {
+    font-weight: bold;
+}
+
+i {
+    font-style: italic;
+}
+
+strong {
+    font-weight: bold;
+}
+
+img a {
+    text-align: bottom;
+}
+
+
+/* ------- 3. Headers ------- */
+
+h1 {
+    font-size: 18px;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+}
+
+h2 {
+    font-size: 18px;
+    margin-bottom: 25px;
+}
+
+h3 {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+h4 {
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+h5 {
+    color: #636363;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+h6 {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+
+/* ------- 4. Buttons & inputs ------- */
+
+.right-button {
+    float: right;
+}
+
+.small-button {
+    font-size: 11px !important;
+    color: #636363;
+    font-weight: normal !important;
+    padding: 1px 10px !important;
+    margin-top: 3px;
+}
+
+.large-button {
+    background: url(../images/large-button.png) repeat-x !important;
+    font-size: 12px !important;
+    font-weight: normal !important;
+    padding: 5px 14px !important;
+}
+
+.large-button:hover {
+    background: url(../images/large-button-hover.png) repeat-x !important;
+}
+
+.large-button:active {
+    background: url(../images/large-button-active.png) repeat-x !important;
+}
+
+input[type="submit"],
+input[type="button"] {
+    background: url(../images/default-button.png) repeat-x;
+    font-size: 11px;
+    color: #636363;
+    font-weight: bold;
+    padding: 5px 12px 4px 12px;
+    border: none;
+    border: 1px solid #d9d9d9;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover,
+input[type="button"]:hover {
+    background: url(../images/default-button-hover.png) repeat-x;
+}
+
+input[type="submit"]:active,
+input[type="button"]:active {
+    background: url(../images/default-button-active.png) repeat-x;
+}
+
+input[type="text"] {
+    background: url(../images/input-bg.png) repeat-x;
+    color: #636363;
+    border: 1px solid #d9d9d9;
+    padding: 4px 6px;
+    font-family: Tahoma, Arial, sans-serif;
+}
+
+.custom-filebrowse {
+    background: url(../images/browse-button.png) no-repeat;
+    width: 77px;
+    height: 26px;
+    position: relative;
+}
+
+.custom-filebrowse input[type="file"] {
+    position: absolute;
+    left: -150px;
+    top: 0;
+    width: 77px;
+    height: 26px;
+    cursor: pointer;
+    opacity: 0;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=0);
+}
+
+/* ------- 5. Tables ------- */
+
+table {
+    font-size: 11px;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+th {
+    background: #f3f3f3;
+    color: #636363;
+    font-weight: bold;
+    border: 1px solid #d9d9d9;
+    padding: 10px 20px;
+}
+
+td {
+    color: #636363;
+    border: 1px solid #d9d9d9;
+    padding: 10px 20px;
+}
+
+
+/* ------- 6. Custom inputs ------- */
+
+.checkbox {
+    width: 15px;
+    height: 23px;
+    padding: 0;
+    background: url(../images/checkbox.png) no-repeat;
+    display: block;
+    clear: left;
+    float: left;
+}
+
+.radio {
+    width: 13px;
+    height: 22px;
+    padding: 0;
+    background: url(../images/radio.png) no-repeat;
+    display: block;
+    clear: left;
+    float: left;
+}
+
+
+/* ______________________________________________________________________________________________________________________________________________________________________
+                                                                               
+																			      02. LAYOUT
+   ______________________________________________________________________________________________________________________________________________________________________ */
+
+
+/* ------- 1. General ------- */
+
+.wrap {
+    width: 1190px;
+    margin: 0 auto;
+}
+
+.login-wrap {
+    width: 400px;
+    margin: 140px auto 0 auto;
+}
+
+.clear {
+    clear: both;
+}
+
+.left-clear {
+    clear: left;
+}
+
+.right-clear {
+    clear: right;
+}
+
+.block-element {
+    display: block;
+}
+
+
+/* ------- 2. Header ------- */
+
+#header {
+    margin-bottom: 50px;
+}
+
+#header #header-top {
+    background: url(../images/top-bg.png) repeat-x;
+    height: 61px;
+}
+
+#header #header-top #logo {
+    float: left;
+    margin-top: 20px;
+}
+
+#header #header-top #profile {
+    background: url(../images/profile-icon.png) no-repeat top left;
+    height: 16px;
+    padding-left: 29px;
+    float: right;
+    margin-top: 20px;
+}
+
+#header #header-top #profile span {
+    display: block;
+    float: left;
+}
+
+#header #header-top #profile span.welcome-text {
+    background: url(../images/profile-sep.png) no-repeat right;
+    color: #b3b2b2;
+    font-size: 11px;
+    padding: 2px 13px 3px 0;
+}
+
+#header #header-top #profile span.logout-button {
+    background: url(../images/profile-sep.png) no-repeat right;
+    padding: 2px 13px 0 11px;
+}
+
+#header #header-top #profile span.logout-button:active {
+    padding-top: 3px;
+}
+
+#header #header-bottom {
+    background: url(../images/top-grey-bg.png) repeat-x;
+    height: 82px;
+}
+
+#header #header-bottom #dropdown {
+    float: left;
+    margin-top: 25px;
+}
+
+/* --- 2.1 Navigation --- */
+
+#header #navigation {
+    float: right;
+    margin-top: 28px;
+}
+
+#header #navigation ul li {
+    background: url(../images/nav-sep.png) no-repeat right center;
+    float: left;
+    color: #023f62;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding: 4px 16px;
+}
+
+#header #navigation ul li a {
+    text-decoration: none;
+    color: #f6f6f6;
+}
+
+#header #navigation ul li a:hover,
+#header #navigation ul li a.active {
+    color: #023F62;
+}
+
+
+/* ------- 3. Content ------- */
+
+#content .panel {
+    background: #f9f9f9;
+    border: 1px solid #d9d9d9;
+    margin-bottom: 20px;
+}
+
+#content .panel .panel-heading {
+    background: url(../images/content-box-heading.png) repeat-x;
+    font-size: 11px;
+    color: #f6f6f6;
+    height: 35px;
+}
+
+#content .panel .panel-heading span {
+    display: block;
+    float: left;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin: 13px 0 0 20px;
+}
+
+#content .panel .panel-heading a {
+    color: #f6f6f6;
+    text-decoration: none;
+    display: block;
+    float: left;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin: 13px 0 0 20px;
+}
+
+#content .panel .panel-heading a:hover,
+#content .panel .panel-heading a.active {
+    text-decoration: none;
+    color: #023f62;
+    display: block;
+    float: left;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin: 13px 0 0 20px;
+}
+
+#content .panel .panel-content {
+    padding: 20px;
+}
+
+
+/* ------- 4. Footer ------- */
+
+#footer {
+    color: #b3b2b2;
+    font-size: 11px;
+    border-top: 1px solid #d9d9d9;
+    border-bottom: 1px solid #d9d9d9;
+    padding: 11px 22px 9px 22px;
+    margin: 30px 0;
+}
+
+#footer span.copyright {
+    float: left;
+}
+
+#footer span.developer {
+    float: right;
+}
+
+
+/* ______________________________________________________________________________________________________________________________________________________________________
+                                                                               
+																			      03. SPECIFIC
+   ______________________________________________________________________________________________________________________________________________________________________ */
+
+
+/* ------- 1. Login ------- */
+
+#login-logo {
+    width: 154px;
+    height: 17px;
+    margin: 0 auto 26px auto;
+}
+
+#login-box {
+    border: 1px solid #d6d6d6;
+}
+
+#login-heading {
+    background: url(../images/login-heading.png) repeat-x;
+    color: #f6f6f6;
+    font-size: 11px;
+    font-weight: bold;
+    height: 34px;
+    padding: 1px;
+}
+
+#login-heading span {
+    display: block;
+    margin: 10px 20px 0 20px;
+}
+
+#login-content {
+    background: #f9f9f9;
+    padding: 20px;
+}
+
+#login-content dl dt {
+    clear: left;
+    float: left;
+    padding: 10px 0 10px 0;
+    width: 70px;
+}
+
+#login-content dl dt label {
+    color: #636363;
+    font-weight: bold;
+    font-size: 11px;
+}
+
+#login-content dl dd {
+    float: left;
+    padding: 5px 0 5px 0;
+    margin-bottom: 20px;
+}
+
+#login-content dl dd input[type="text"],
+#login-content dl dd input[type="password"] {
+    background: url(../images/login-input-bg.png) repeat-x;
+    color: #636363;
+    width: 270px;
+    padding: 5px 8px 4px 8px;
+    font-size: 11px;
+    border: 1px solid #d9d9d9;
+}
+
+#login-content dl dd textarea {
+    background: url(../images/login-input-bg.png) repeat-x;
+    color: #636363;
+    width: 270px;
+    min-width: 270px;
+    max-width: 270px;
+    height: 100px;
+    padding: 5px 8px 4px 8px;
+    font-size: 11px;
+    border: 1px solid #d9d9d9;
+    font-family: Tahoma, Arial, sans-serif;
+}
+
+#login-content input[type="submit"] {
+    margin-top: -5px;
+}
+
+#forgot-password {
+    width: 70px;
+    margin: 12px auto 0 auto;
+}
+
+#forgot-password a {
+    font-size: 11px;
+    text-decoration: none;
+    color: #939393;
+}
+
+#forgot-password a:hover {
+    color: #707070;
+}
+
+
+/* ------- 2. Notifications ------- */
+
+.notification-table {
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.notification {
+    height: 38px;
+    margin-bottom: 15px;
+}
+
+.notification td {
+    vertical-align: middle;
+    padding: 0 20px;
+    border: none;
+}
+
+/* --- 2.1 Colors --- */
+
+.good-notif {
+    background: #bbdc84;
+    color: #43640d;
+    border: 1px solid #8fb848;
+}
+
+.good-notif td {
+    color: #43640d;
+}
+
+.medium-notif {
+    background: #fbf480;
+    color: #726e24;
+    border: 1px solid #a6a146;
+}
+
+.medium-notif td {
+    color: #726e24;
+}
+
+.bad-notif {
+    background: #f48e8e;
+    color: #8c3f3f;
+    border: 1px solid #b65656;
+}
+
+.bad-notif td {
+    color: #8c3f3f;
+}
+
+.warning-notif {
+    background: #fdb27a;
+    color: #7e563a;
+    border: 1px solid #c18459;
+}
+
+.warning-notif td {
+    color: #7e563a;
+}
+
+
+/* ------- 3. Product image ------- */
+
+.product-image {
+    float: left;
+    position: relative;
+}
+
+.product-image .large-product-img {
+    display: none;
+    position: absolute;
+    left: 30px;
+    top: -50px;
+}
+
+.product-image:hover .large-product-img {
+    display: block;
+    width: 200px;
+}
+
+
+/* ------- 4. Report ------- */
+
+.report-type {
+    padding-bottom: 15px;
+    border: 1px solid #d9d9d9;
+    margin-bottom: -1px;
+    padding: 20px 20px 10px 20px;
+}
+
+.report-type .radio {
+    clear: none;
+}
+
+.report-type .dk_container {
+    float: right;
+    text-transform: uppercase;
+}
+
+.table-checkbox {
+    clear: left;
+    padding: 0 50%;
+}
+
+.radio-label {
+    display: block;
+    color: #636363;
+    float: left;
+    margin: 8px 60px 8px 8px;
+}
+
+.additional-options {
+    float: left;
+}
+
+.additional-options dl dt {
+    clear: left;
+    float: left;
+    padding: 10px 0 10px 0;
+    width: 90px;
+}
+
+.additional-options dl dt label {
+    color: #636363;
+    font-weight: bold;
+    font-size: 11px;
+    text-align: right;
+    display: block;
+    margin: 2px 13px 0 0;
+}
+
+.additional-options dl dd {
+    float: left;
+    padding: 5px 0 5px 0;
+    margin-bottom: 5px;
+}
+
+.additional-options .additional-options-left-col {
+    float: left;
+}
+
+.additional-options .additional-options-right-col {
+    float: left;
+    margin-left: 20px;
+}
+
+.report-buttons {
+    float: right;
+    margin-top: 10px;
+}
+
+.report-buttons input {
+    margin-left: 15px;
+}
+
+select {
+    font-size: 12px;
+    font-family: Tahoma, Arial, sans-serif;
+    padding: 3px;
+    border: 1px solid #d9d9d9;
+}
