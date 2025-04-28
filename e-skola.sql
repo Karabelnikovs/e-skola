@@ -3,7 +3,7 @@ CREATE TABLE users (
     name VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role VARCHAR(255) DEFAULT 'user',
+    role VARCHAR(255) DEFAULT 'learner',
     language VARCHAR(5) DEFAULT 'lv',
     created_at TIMESTAMP NULL,
     updated_at TIMESTAMP NULL
@@ -102,18 +102,6 @@ CREATE TABLE certificates (
     FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
 );
 
-CREATE TABLE translations (
-    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    entity_type VARCHAR(255) NOT NULL,
-    entity_id INT UNSIGNED NOT NULL,
-    language VARCHAR(5) NOT NULL,
-    field VARCHAR(255) NOT NULL,
-    translation TEXT NOT NULL,
-    created_at TIMESTAMP NULL,
-    updated_at TIMESTAMP NULL,
-    INDEX entity_index (entity_type, entity_id)
-);
-
 CREATE TABLE user_topic_completions (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id INT UNSIGNED NOT NULL,
@@ -194,3 +182,44 @@ ALTER TABLE `questions`
 DROP COLUMN question_text,
 DROP COLUMN options;
 
+ALTER TABLE `tests`
+ADD COLUMN `title_lv` VARCHAR(255) AFTER `title`,
+ADD COLUMN `title_en` VARCHAR(255) AFTER `title_lv`,
+ADD COLUMN `title_ru` VARCHAR(255) AFTER `title_en`,
+ADD COLUMN `title_ua` VARCHAR(255) AFTER `title_ru`;
+
+ALTER TABLE `tests`
+DROP COLUMN title;
+
+CREATE TABLE dictionaries (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `course_id` BIGINT(20) UNSIGNED NOT NULL,
+    title_lv VARCHAR(255),
+    title_en VARCHAR(255),
+    title_ru VARCHAR(255),
+    title_ua VARCHAR(255),
+    `order` INT NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE
+);
+CREATE TABLE translations (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    dictionary_id INT UNSIGNED NOT NULL,
+    phrase_en VARCHAR(255),
+	 phrase_lv VARCHAR(255),
+	 phrase_ua VARCHAR(255),
+	 phrase_ru VARCHAR(255),
+    `order` INT NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL,
+    FOREIGN KEY (dictionary_id) REFERENCES dictionaries(id) ON DELETE CASCADE
+);
+
+ALTER TABLE `topics`
+CHANGE COLUMN `content_uk` `content_ua` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci',
+CHANGE COLUMN `title_uk` `title_ua` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci';
+
+ALTER TABLE `courses`
+CHANGE COLUMN `title_uk` `title_ua` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci',
+CHANGE COLUMN `description_uk` `description_ua` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci';
