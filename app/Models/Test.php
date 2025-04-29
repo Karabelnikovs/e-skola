@@ -16,7 +16,6 @@ class Test extends Model
         'order',
         'course_id',
         'type',
-
     ];
 
 }

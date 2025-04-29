@@ -223,3 +223,13 @@ CHANGE COLUMN `title_uk` `title_ua` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8
 ALTER TABLE `courses`
 CHANGE COLUMN `title_uk` `title_ua` VARCHAR(255) NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci',
 CHANGE COLUMN `description_uk` `description_ua` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci';
+
+ALTER TABLE tests
+DROP COLUMN TYPE;
+
+ALTER TABLE tests
+ADD COLUMN type VARCHAR(255) NOT NULL;
+
+
+ALTER TABLE certificates
+ADD COLUMN is_read INT NOT NULL;

@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\File;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class TestController extends Controller
@@ -70,7 +72,7 @@ class TestController extends Controller
             }
 
             $lang = Session::get('lang', 'lv');
-            $optionsField = 'options_' . ($lang === 'ua' ? 'uk' : $lang); // Fix for Ukrainian
+            $optionsField = 'options_' . ($lang === 'ua' ? 'uk' : $lang);
             $options = json_decode($question->$optionsField) ?? explode(',', $question->$optionsField);
 
             $correctIndex = (int) $question->correct_answer;
@@ -100,24 +102,12 @@ class TestController extends Controller
             'updated_at' => now(),
         ]);
 
-        // foreach ($answers as $questionId => $answerGiven) {
-        //     $question = $questions->where('id', $questionId)->first();
-        //     $isCorrect = $question->correct_answer == $answerGiven;
-        //     DB::table('answers')->insert([
-        //         'attempt_id' => $attemptId,
-        //         'question_id' => $questionId,
-        //         'answer_given' => $answerGiven,
-        //         'is_correct' => $isCorrect,
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ]);
-        // }
 
         foreach ($answers as $questionId => $submittedAnswer) {
             $question = $questions->where('id', $questionId)->first();
 
             $lang = Session::get('lang', 'lv');
-            $optionsField = 'options_' . ($lang === 'ua' ? 'uk' : $lang); // same fix
+            $optionsField = 'options_' . ($lang === 'ua' ? 'uk' : $lang);
             $options = json_decode($question->$optionsField) ?? explode(',', $question->$optionsField);
 
             $submittedIndex = array_search($submittedAnswer, $options);
@@ -136,6 +126,52 @@ class TestController extends Controller
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+        }
+
+        if ($passed && $test->type === 'final') {
+            $courseId = $test->course_id;
+
+            $existingCertificate = DB::table('certificates')
+                ->where('user_id', $user->id)
+                ->where('course_id', $courseId)
+                ->first();
+
+            if (!$existingCertificate) {
+                $course = DB::table('courses')->find($courseId);
+                if (!$course) {
+                    return response()->json(['error' => 'Course not found'], 404);
+                }
+
+                $certificatePath = 'certificates/user_' . $user->id . '_course_' . $courseId . '.pdf';
+                $fullPath = storage_path('app/public/' . $certificatePath);
+
+                $directory = storage_path('app/public/certificates');
+                if (!File::exists($directory)) {
+                    File::makeDirectory($directory, 0755, true);
+                }
+
+                try {
+                    $issuedAt = now();
+                    $pdf = Pdf::loadView('certificate', [
+                        'user' => $user,
+                        'course' => $course,
+                        'issued_at' => $issuedAt,
+                    ]);
+                    $pdf->save($fullPath);
+                } catch (\Exception $e) {
+                    return response()->json(['error' => 'Failed to generate certificate: ' . $e->getMessage()], 500);
+                }
+
+                DB::table('certificates')->insert([
+                    'user_id' => $user->id,
+                    'course_id' => $courseId,
+                    'issued_at' => $issuedAt,
+                    'certificate_path' => $certificatePath,
+                    'created_at' => $issuedAt,
+                    'updated_at' => $issuedAt,
+                    'is_read' => 0,
+                ]);
+            }
         }
 
         return response()->json([

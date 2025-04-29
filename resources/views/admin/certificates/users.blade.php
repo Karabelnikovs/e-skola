@@ -23,7 +23,7 @@
     <div class="col-md-12">
         <div class="card-header">
             <div class="d-flex align-items-center">
-                <h4 class="card-title">Lietotāju testu vēsture</h4>
+                <h4 class="card-title">Lietotāju sertifikāti</h4>
             </div>
         </div>
         <div class="card-body">
@@ -67,8 +67,8 @@
                                             <td>{{ $user->role }}</td>
                                             <td>
                                                 <div class="form-button-action">
-                                                    <a href="{{ route('tests.history', [$user->id]) }}"
-                                                        class="btn btn-label-info btn-round me-2">Apskatīt vēsturi
+                                                    <a href="{{ route('user.certificates', [$user->id]) }}"
+                                                        class="btn btn-label-info btn-round me-2">Sertifikāti
                                                         <i class="fas fa-angle-right"></i></a>
                                                 </div>
                                             </td>

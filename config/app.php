@@ -124,6 +124,12 @@ return [
     ],
 
 
-
+    // // 'providers' => [
+    // //     Barryvdh\DomPDF\ServiceProvider::class,
+    // //     vendor\barryvdh\laravel - dompdf\src\ServiceProvider::class,
+    // // ],
+    // 'aliases' => [
+    //     'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
+    // ],
 
 ];

@@ -51,7 +51,7 @@ class CourseController extends Controller
         return view('.courses.module', compact('module', 'title', 'courses', 'items'));
     }
 
-    public function dictionary($id)
+    public function dictionary($id, $type)
     {
         $lang = Session::get('lang', 'lv');
         $dictionary = DB::table('dictionaries')->where('id', $id)->first();
@@ -66,6 +66,85 @@ class CourseController extends Controller
 
         $title = $dictionary->{'title_' . app()->getLocale()} ?? $dictionary->title_en;
 
-        return view('courses.dictionary', compact('dictionary', 'title', 'courses', 'items', 'course_id'));
+        return view('courses.dictionary', compact('dictionary', 'title', 'courses', 'items', 'course_id', 'type'));
     }
+
+    public function dictionaries()
+    {
+        $lang = Session::get('lang', 'lv');
+        $dictionaries = DB::table('dictionaries')->orderBy('order')->get();
+        $courses = Course::all();
+        switch ($lang) {
+            case 'ua':
+                $title = 'Словники';
+                break;
+            case 'ru':
+                $title = 'Словари';
+                break;
+            case 'lv':
+                $title = 'Vārdnīcas';
+                break;
+            default:
+                $title = 'Dictionaries';
+        }
+        return view('courses.dictionaries', compact('dictionaries', 'title', 'courses'));
+    }
+
+    public function profile()
+    {
+        $lang = Session::get('lang', 'lv');
+
+        $user = auth()->user();
+        $courses = Course::all();
+        switch ($lang) {
+            case 'ua':
+                $title = 'Профіль';
+                break;
+            case 'ru':
+                $title = 'Профиль';
+                break;
+            case 'lv':
+                $title = 'Profils';
+                break;
+            default:
+                $title = 'Profile';
+        }
+
+        return view('courses.profile', compact('user', 'title', 'courses'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = auth()->user();
+        $lang = Session::get('lang', 'lv');
+        $validated = $request->validate(
+            [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,' . $user->id,
+                'password' => 'nullable|string|min:8|confirmed',
+                'language' => 'required|string|in:lv,en,ru,ua',
+            ],
+            [
+                'email.unique' => 'Šis e-pasts jau ir reģistrēts!',
+                'password.confirmed' => 'Parole un apstiprinājums nesakrīt!',
+                'name.required' => 'Lūdzu ievadiet vārdu!',
+                'email.required' => 'Lūdzu ievadiet e-pastu!',
+            ]
+        );
+
+        $updateData = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'language' => $validated['language'],
+            'updated_at' => now(),
+        ];
+        if (!empty($validated['password'])) {
+            $updateData['password'] = bcrypt($validated['password']);
+        }
+        DB::table('users')->where('id', $user->id)->update($updateData);
+
+        return redirect()->route($lang . '.profile')->with('success', 'Profile updated successfully');
+    }
+
+
 }

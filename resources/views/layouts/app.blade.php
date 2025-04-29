@@ -86,6 +86,11 @@
         ],
     ];
     $lang = Session::get('lang', 'lv');
+
+    $new_certificates = DB::table('certificates')
+        ->where('user_id', auth()->user()->id)
+        ->where('is_read', 0)
+        ->count();
 @endphp
 <style>
     .logo-app {
@@ -110,30 +115,20 @@
             <div class="sidebar-logo">
                 <!-- Logo Header -->
                 <div class="logo-header" data-background-color="dark">
-                    {{-- <a href="/admin" class="logo">
-                        <img src="https://vizii.lv/urban/wp-content/uploads/sites/2/2021/09/cropped-vizii_fav-32x32.png"
-                            alt="Vizii Logo" class="navbar-brand" height="20" /> <span class="text-white mx-2">Vizii
-                            E-Skola</span>
-                    </a> --}}
-                    {{-- <div class="navbar-brand d-flex align-items-center"> --}}
                     <div class="navbar-brand d-flex align-items-center flex-wrap gap-2 justify-content-center">
-
                         @php
                             $segments = request()->segments();
                             $currentLocale = $segments[0] ?? 'lv';
                             $pathWithoutLocale = implode('/', array_slice($segments, 1));
                             $queryString = request()->getQueryString() ? '?' . request()->getQueryString() : '';
                         @endphp
-
                         @foreach (config('locale.supported') as $language)
                             <a @if (!empty($pathWithoutLocale)) { href="/{{ $language }}/{{ $pathWithoutLocale }}{{ $queryString }}" } @else { href="/{{ $language }}" } @endif
-                                @if ($currentLocale == $language) style="font-weight: bold; color: #9810fa !important; " @else style="color: white;" @endif
+                                @if ($currentLocale == $language) style="font-weight: bold; color: #9810fa !important;" @else style="color: white;" @endif
                                 class="logo-app logo">
                                 {{ strtoupper($language) }}
                             </a>
                         @endforeach
-
-
                     </div>
                     <div class="nav-toggle">
                         <button class="btn btn-toggle toggle-sidebar">
@@ -152,66 +147,62 @@
             <div class="sidebar-wrapper scrollbar scrollbar-inner">
                 <div class="sidebar-content">
                     <ul class="nav nav-secondary">
-                        {{-- <li class="nav-section">
-                            <span class="sidebar-mini-icon">
-                                <i class="fa fa-ellipsis-h"></i>
-                            </span>
-                            <h4 class="text-section">{{ $translations[$lang]['modules'] }}</h4>
-                        </li> --}}
-                        <li class="nav-item active">
-                            <a data-bs-toggle="collapse" href="#dashboard" class="collapsed" aria-expanded="false">
+                        <li class="nav-item {{ Route::currentRouteName() == $lang . '.module.show' ? 'active' : '' }}">
+                            <a data-bs-toggle="collapse" href="#dashboard" class="collapsed"
+                                aria-expanded="{{ Route::currentRouteName() == $lang . '.module.show' ? 'true' : 'false' }}">
                                 <i class="fas fa-book-open"></i>
                                 <p>{{ $translations[$lang]['modules'] }}</p>
                                 <span class="caret"></span>
                             </a>
-                            <div class="collapse" id="dashboard">
+                            <div class="collapse {{ Route::currentRouteName() == $lang . '.module.show' ? 'show' : '' }}"
+                                id="dashboard">
                                 <ul class="nav nav-collapse">
-
                                     @foreach ($courses as $course)
-                                        <li>
+                                        <li
+                                            class="{{ Route::currentRouteName() == $lang . '.module.show' && request()->route()->parameter('id') == $course->id ? 'active' : '' }}">
                                             <a href="{{ route($lang . '.module.show', $course->id) }}">
-
                                                 <span class="sub-item">{{ $course->{'title_' . $lang} }}</span>
-
                                             </a>
                                         </li>
                                     @endforeach
                                 </ul>
                             </div>
                         </li>
-
-
-                        <li class="nav-item">
+                        <li class="nav-item {{ Route::currentRouteName() == $lang . '.tests' ? 'active' : '' }}">
                             <a href="{{ route($lang . '.tests') }}">
                                 <i class="fas fa-pen-square"></i>
                                 <p>{{ $translations[$lang]['tests'] }}</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('development') }}">
+                        <li class="nav-item {{ Route::currentRouteName() == $lang . '.topics.view' ? 'active' : '' }}">
+                            <a href="{{ route($lang . '.topics.view') }}">
                                 <i class="fas fa-file"></i>
                                 <p>{{ $translations[$lang]['topics'] }}</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('development') }}">
+                        <li
+                            class="nav-item {{ Route::currentRouteName() == $lang . '.dictionaries.view' ? 'active' : '' }}">
+                            <a href="{{ route($lang . '.dictionaries.view') }}">
                                 <i class="fas fa-book"></i>
                                 <p>{{ $translations[$lang]['dictionaries'] }}</p>
                             </a>
-                        <li class="nav-item">
-                            <a href="{{ route('development') }}">
+                        </li>
+                        <li
+                            class="nav-item {{ Route::currentRouteName() == $lang . '.certificates' ? 'active' : '' }}">
+                            <a href="{{ route($lang . '.certificates') }}">
                                 <i class="fa-solid fa-circle-check"></i>
                                 <p>{{ $translations[$lang]['certificates'] }}</p>
+                                @if ($new_certificates > 0)
+                                    <span class="badge badge-success">{{ $new_certificates }}</span>
+                                @endif
                             </a>
                         </li>
-
-                        <li class="nav-item">
-                            <a href="{{ route('development') }}">
+                        <li class="nav-item {{ Route::currentRouteName() == $lang . '.profile' ? 'active' : '' }}">
+                            <a href="{{ route($lang . '.profile') }}">
                                 <i class="fa-solid fa-user-alt"></i>
                                 <p>{{ $translations[$lang]['profile'] }}</p>
                             </a>
                         </li>
-
                     </ul>
                 </div>
             </div>

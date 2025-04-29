@@ -59,6 +59,7 @@ class RegisterController extends Controller
     protected function registered(Request $request, $user)
     {
         Session::put('lang', $user->main_lang);
-        return redirect()->route('courses.index', ['lang' => $user->main_lang])->with('success', __('Registration successful!'));
+
+        return redirect()->route($user->main_lang . '.courses.index', ['lang' => $user->main_lang])->with('success', __('Registration successful!'));
     }
 }

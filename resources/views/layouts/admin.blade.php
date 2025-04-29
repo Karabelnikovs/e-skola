@@ -82,21 +82,25 @@
                             </span>
                             <h4 class="text-section">Moduļi</h4>
                         </li>
-                        <li class="nav-item active">
-                            <a data-bs-toggle="collapse" href="#dashboard" class="collapsed" aria-expanded="false">
+                        <li
+                            class="nav-item {{ Route::currentRouteName() == 'module.all' ? 'active' : '' }} {{ Route::currentRouteName() == 'module' ? 'active' : '' }}">
+                            <a data-bs-toggle="collapse" href="#dashboard" class="collapsed"
+                                aria-expanded="{{ Route::currentRouteName() == 'module' ? 'true' : 'false' }}">
                                 <i class="fas fa-book-open"></i>
                                 <p>Moduļi</p>
                                 <span class="caret"></span>
                             </a>
-                            <div class="collapse" id="dashboard">
+                            <div class="collapse {{ Route::currentRouteName() == 'module.all' ? 'show' : '' }} {{ Route::currentRouteName() == 'module' ? 'show' : '' }}"
+                                id="dashboard">
                                 <ul class="nav nav-collapse">
-                                    <li>
+                                    <li class=" {{ Route::currentRouteName() == 'module.all' ? 'active' : '' }}">
                                         <a href="{{ route('module.all') }}">
                                             <span class="sub-item">Visi moduļi </span>
                                         </a>
                                     </li>
                                     @foreach ($courses as $course)
-                                        <li>
+                                        <li
+                                            class="{{ Route::currentRouteName() == 'module' && request()->route()->parameter('id') == $course->id ? 'active' : '' }}">
                                             <a href="{{ route('module', $course->id) }}">
                                                 <span class="sub-item">{{ $course->title_lv }}</span>
                                             </a>
@@ -105,7 +109,7 @@
                                 </ul>
                             </div>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item {{ Route::currentRouteName() == 'module.create' ? 'active' : '' }}">
                             <a href="{{ route('module.create') }}">
                                 <i class="fas fa-plus-circle"></i>
                                 <p>Izveidot jaunu moduli</p>
@@ -120,32 +124,26 @@
                         </li>
 
 
-                        <li class="nav-item">
+                        <li class="nav-item {{ Route::currentRouteName() == 'admin.users' ? 'active' : '' }}">
                             <a href="{{ route('admin.users') }}">
                                 <i class="fas fa-users"></i>
                                 <p>Lietotāji</p>
                             </a>
                         </li>
-                        <li class="nav-item">
+                        <li class="nav-item {{ Route::currentRouteName() == 'tests.users' ? 'active' : '' }}">
                             <a href="{{ route('tests.users') }}">
                                 <i class="fas fa-pen-square"></i>
                                 <p>Testi</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('development') }}">
+                        <li class="nav-item {{ Route::currentRouteName() == 'topics' ? 'active' : '' }}">
+                            <a href="{{ route('topics') }}">
                                 <i class="fas fa-file"></i>
                                 <p>Tēmas</p>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="{{ route('development') }}">
-                                <i class="fas fa-th-list"></i>
-                                <p>Apmācības secība</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('development') }}">
+                        <li class="nav-item {{ Route::currentRouteName() == 'certificates' ? 'active' : '' }}">
+                            <a href="{{ route('certificates') }}">
                                 <i class="fa-solid fa-circle-check"></i>
                                 <p>Sertifikāti</p>
                             </a>

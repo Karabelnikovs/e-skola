@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Session;
 
 class TopicController extends Controller
 {
-    public function topic($id)
+    public function topic($id, $type)
     {
         $lang = Session::get('lang', 'lv');
         $topic = DB::table('topics')->where('id', $id)->first();
@@ -25,6 +25,29 @@ class TopicController extends Controller
         $title = $topic->{'title_' . Session::get('lang', 'lv')} ?? $topic->title_en;
 
 
-        return view('courses.topic', compact('topic', 'title', 'course', 'course_id', 'courses'));
+        return view('courses.topic', compact('topic', 'title', 'course', 'course_id', 'courses', 'type'));
+    }
+
+    public function topics()
+    {
+        $lang = Session::get('lang', 'lv');
+        $topics = DB::table('topics')->get();
+        $courses = DB::table('courses')->get();
+
+        switch ($lang) {
+            case 'ua':
+                $title = 'Темы';
+                break;
+            case 'ru':
+                $title = 'Темы';
+                break;
+            case 'lv':
+                $title = 'Tēmas';
+                break;
+            default:
+                $title = 'Topics';
+        }
+
+        return view('courses.topics', compact('topics', 'courses', 'title'));
     }
 }

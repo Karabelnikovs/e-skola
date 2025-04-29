@@ -36,6 +36,9 @@ class AdminController extends Controller
 
     public function translateText(Request $request)
     {
+
+        //! ukraiņu tulkojumi google translate neiet ar ua vai ukr, bet tikai ar uk 😑
+
         $request->validate([
             'text' => 'required|string',
             'to' => 'required|string',
@@ -44,7 +47,6 @@ class AdminController extends Controller
         $translation = new GoogleTranslate('en');
         $result = $translation->setSource($request->from)->setTarget($request->to)->translate($request->text);
 
-        // \Log::info('Translation request: ' . $result);
 
         return response()->json(['translated' => $result ?? '[Translation error]']);
     }
@@ -367,6 +369,7 @@ class AdminController extends Controller
             'title_ua' => 'required|string|max:255',
             'passing_score' => 'required|integer|min:0',
             'course_id' => 'required|exists:courses,id',
+            'is_final_test' => 'nullable',
             'questions' => 'required|array',
             'questions.*.question_lv' => 'required|string',
             'questions.*.question_en' => 'required|string',
@@ -386,6 +389,8 @@ class AdminController extends Controller
 
         $maxOrder = max($maxOrderTopic, $maxOrderTest, $maxOrderDictionary);
 
+        $type = $request->has('is_final_test') ? 'final' : 'test';
+
         $test = Test::create([
             'course_id' => $validated['course_id'],
             'title_en' => $validated['title_en'],
@@ -394,6 +399,7 @@ class AdminController extends Controller
             'title_ua' => $validated['title_ua'],
             'passing_score' => $validated['passing_score'],
             'order' => $maxOrder + 1,
+            'type' => $type,
         ]);
 
         foreach ($validated['questions'] as $index => $questionData) {
@@ -449,6 +455,7 @@ class AdminController extends Controller
             'title_ua' => 'required|string|max:255',
             'passing_score' => 'required|integer|min:0',
             'course_id' => 'required|exists:courses,id',
+            'is_final_test' => 'nullable',
             'questions' => 'required|array',
             'questions.*.question_lv' => 'required|string',
             'questions.*.question_en' => 'required|string',
@@ -463,6 +470,7 @@ class AdminController extends Controller
         ]);
 
         $test = Test::findOrFail($id);
+        $type = $request->has('is_final_test') ? 'final' : 'test';
 
         $test->update([
             'title_en' => $validated['title_en'],
@@ -470,6 +478,7 @@ class AdminController extends Controller
             'title_ru' => $validated['title_ru'],
             'title_ua' => $validated['title_ua'],
             'passing_score' => $validated['passing_score'],
+            'type' => $type,
         ]);
 
         Question::where('test_id', $test->id)->delete();
@@ -841,4 +850,62 @@ class AdminController extends Controller
         return view('admin.tests.attempt', compact('attempt', 'courses', 'title', 'answers', 'test_id', 'question_count'));
     }
 
+
+    public function topics()
+    {
+        $topics = DB::table('topics')->get();
+        $courses = DB::table('courses')->get();
+
+
+        $title = 'Tēmas';
+
+
+        return view('admin.topics', compact('topics', 'courses', 'title'));
+    }
+
+    public function topic($id)
+    {
+        $topic = DB::table('topics')->where('id', $id)->first();
+
+
+        $courses = DB::table('courses')->get();
+        $course_id = $topic->course_id;
+
+        $course = DB::table('courses')->where('id', $course_id)->first();
+
+
+        $title = $topic->title_lv;
+
+
+        return view('admin.topic-view', compact('topic', 'title', 'course', 'course_id', 'courses'));
+    }
+
+
+    public function certificatesUsers()
+    {
+        $courses = DB::table('courses')->get();
+        $users = DB::table('users')->orderBy('created_at', 'desc')->get();
+        $title = 'Lietotāju sertifikāti';
+        return view('admin.certificates.users', compact('title', 'users', 'courses'));
+    }
+
+    public function certificates($userID)
+    {
+        $courses = DB::table('courses')->get();
+        $title = 'Lietotāja sertifikāti';
+        $user = DB::table('users')->where('id', $userID)->first();
+        if (!$user) {
+            return redirect()->route('admin.users')->with('error', 'Lietotājs nav atrasts!');
+        }
+
+        $certificates = DB::table('certificates')
+            ->join('courses', 'certificates.course_id', '=', 'courses.id')
+            ->select('certificates.*', 'courses.*')
+            ->where('certificates.user_id', $userID)
+            ->orderBy('certificates.created_at', 'desc')
+            ->get();
+
+
+        return view('admin.certificates.certificates', compact('certificates', 'courses', 'title', 'user'));
+    }
 }

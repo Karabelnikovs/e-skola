@@ -45,7 +45,7 @@
                             data-lang="{{ $code == 'ua' ? 'uk' : $code }}" data-type="title">Tulkot no
                             EN</button>
                     </label>
-                    <input type="text" class="form-control" id="title_{{ $code }}"
+                    <input type="text" class="form-control" id="title_{{ $code == 'ua' ? 'uk' : $code }}"
                         name="title_{{ $code }}"
                         value="{{ old('title_' . $code, $topic->{'title_' . $code} ?? '') }}">
                 </div>
@@ -64,7 +64,8 @@
                             data-lang="{{ $code == 'ua' ? 'uk' : $code }}" data-type="content">Tulkot no
                             EN</button>
                     </label>
-                    <textarea name="content_{{ $code }}" id="content_{{ $code }}" class="editor" style="height: 400px;">{{ old("content_$code", $topic?->{"content_$code"} ?? '') }}</textarea>
+                    <textarea name="content_{{ $code }}" id="content_{{ $code == 'ua' ? 'uk' : $code }}" class="editor"
+                        style="height: 400px;">{{ old("content_$code", $topic?->{"content_$code"} ?? '') }}</textarea>
                 </div>
             @endforeach
 
@@ -127,7 +128,7 @@
     <script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
     <script>
         const editors = {};
-        const allEditorIDs = ['content_en', 'content_lv', 'content_ru', 'content_ua'];
+        const allEditorIDs = ['content_en', 'content_lv', 'content_ru', 'content_uk'];
 
         Promise.all(allEditorIDs.map(id => {
             return ClassicEditor.create(document.querySelector('#' + id), {
@@ -165,12 +166,12 @@
         document.querySelectorAll('.translate-btn').forEach(btn => {
             btn.addEventListener('click', async function() {
                 const lang = this.dataset.lang;
-                if (lang === 'uk') {
-                    target_lang = 'ua';
-                }
+                // const target_lang = lang;
+
                 const type = this.dataset.type;
                 const sourceId = type === 'title' ? 'title_en' : 'content_en';
-                const targetId = type === 'title' ? `title_${target_lang}` : `content_${target_lang}`;
+                const targetId = type === 'title' ? `title_${lang}` : `content_${lang}`;
+                console.log(lang, type, sourceId, targetId);
 
                 const sourceValue = type === 'title' ?
                     document.getElementById(sourceId).value :

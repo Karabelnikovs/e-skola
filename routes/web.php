@@ -27,6 +27,7 @@ foreach ($locales as $locale) {
         Route::middleware(['AuthCheck'])->group(function () use ($locale) {
             Route::get('/', [CourseController::class, 'index'])->name($locale . '.courses.index');
             Route::get('profile', [CourseController::class, 'profile'])->name($locale . '.profile');
+            Route::post('profile', [CourseController::class, 'updateProfile'])->name('profile.update');
 
             Route::get('module/{id}', [CourseController::class, 'module'])->name($locale . '.module.show');
             Route::get('test/{id}', [TestController::class, 'show'])->name($locale . '.test.show');
@@ -37,13 +38,15 @@ foreach ($locales as $locale) {
             Route::get('attempts/{id}', [TestController::class, 'attempts'])->name($locale . '.attempts.view');
             Route::get('attempt/{id}', [TestController::class, 'attempt'])->name($locale . '.attempt.view');
 
-            Route::get('topic/{id}', [TopicController::class, 'topic'])->name($locale . '.topic.view');
+            Route::get('topic/{id}/{type}', [TopicController::class, 'topic'])->name($locale . '.topic.view');
+            Route::get('topics', [TopicController::class, 'topics'])->name($locale . '.topics.view');
 
             Route::get('certificate/{id}', [CertificateController::class, 'certificate'])->name($locale . '.certificate.show');
             Route::get('certificates', [CertificateController::class, 'certificates'])->name($locale . '.certificates');
+            Route::get('certificate/download/{userID}/{courseID}', [CertificateController::class, 'download'])->name('certificate.download');
 
             Route::get('dictionaries', [CourseController::class, 'dictionaries'])->name($locale . '.dictionaries.view');
-            Route::get('/dictionary/{id}', [CourseController::class, 'dictionary'])->name($locale . '.dictionary.view');
+            Route::get('/dictionary/{id}/{type}', [CourseController::class, 'dictionary'])->name($locale . '.dictionary.view');
         });
     });
 }
@@ -57,7 +60,10 @@ Route::middleware(['AdminCheck'])->group(function () {
     Route::delete('/admin/users/{user}', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
 
     Route::get('/topics', [AdminController::class, 'topics'])->name('topics');
-    Route::get('/sequences', [AdminController::class, 'sequences'])->name('sequences');
+    Route::get('topic/{id}', [AdminController::class, 'topic'])->name('topic.view');
+
+    Route::get('certificates', [AdminController::class, 'certificatesUsers'])->name('certificates');
+    Route::get('certificates/{id}', [AdminController::class, 'certificates'])->name('user.certificates');
 
     //modules
     Route::get('/all-modules', [AdminController::class, 'all_modules'])->name('module.all');
