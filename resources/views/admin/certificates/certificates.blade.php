@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
     @php
@@ -27,7 +27,6 @@
                         <a href="{{ route('certificate.download', [$item->user_id, $item->course_id]) }}"
                             class="btn btn-label-info btn-round me-2"> Lejupielādēt <i class="fas fa-file-download"></i></a>
                     </div>
-
                 </div>
             @endforeach
         </div>

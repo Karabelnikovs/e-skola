@@ -142,7 +142,8 @@
                                 <p>Tēmas</p>
                             </a>
                         </li>
-                        <li class="nav-item {{ Route::currentRouteName() == 'certificates' ? 'active' : '' }}">
+                        <li
+                            class="nav-item {{ Route::currentRouteName() == 'certificates' ? 'active' : '' }} {{ Route::currentRouteName() == 'user.certificates' ? 'active' : '' }}">
                             <a href="{{ route('certificates') }}">
                                 <i class="fa-solid fa-circle-check"></i>
                                 <p>Sertifikāti</p>

@@ -233,3 +233,10 @@ ADD COLUMN type VARCHAR(255) NOT NULL;
 
 ALTER TABLE certificates
 ADD COLUMN is_read INT NOT NULL;
+
+
+ALTER TABLE `questions`
+MODIFY COLUMN `options_lv` TEXT COLLATE 'utf8mb4_unicode_ci',
+MODIFY COLUMN `options_en` TEXT COLLATE 'utf8mb4_unicode_ci',
+MODIFY COLUMN `options_ru` TEXT COLLATE 'utf8mb4_unicode_ci',
+MODIFY COLUMN `options_ua` TEXT COLLATE 'utf8mb4_unicode_ci';
