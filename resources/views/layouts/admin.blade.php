@@ -149,6 +149,24 @@
                                 <p>Sertifikāti</p>
                             </a>
                         </li>
+                        <li class="nav-item {{ Route::currentRouteName() == 'contacts' ? 'active' : '' }}">
+                            <a href="{{ route('contacts') }}">
+                                <i class="fas fa-envelope"></i>
+                                <p>Kontaktsekcija</p>
+                            </a>
+                        </li>
+                        <li class="nav-item {{ Route::currentRouteName() == 'rules' ? 'active' : '' }}">
+                            <a href="{{ route('rules') }}">
+                                <i class="fas fa-info-circle"></i>
+                                <p>Noteikumi</p>
+                            </a>
+                        </li>
+                        <li class="nav-item {{ Route::currentRouteName() == 'privacy' ? 'active' : '' }}">
+                            <a href="{{ route('privacy') }}">
+                                <i class="fas fa-lock"></i>
+                                <p>Privātuma politika</p>
+                            </a>
+                        </li>
 
 
                     </ul>
@@ -204,16 +222,7 @@
                 </div>
             </div>
 
-            <footer class="footer">
-                <div class=" w-full flex justify-center align-center">
 
-                    <div class="copyright d-flex justify-content-center align-items-center"><span>
-                            {{ now()->year }}, izstrādātājs </span><a target="_blank"
-                            class="nav-link text-primary ms-1" href="http://www.devera.lv">Devera.lv</a>
-                    </div>
-
-                </div>
-            </footer>
         </div>
 
 

@@ -6,10 +6,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title }}</title>
+    <title>{{ $title ?? 'Reset Password' }}</title>
 
 
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,700,900" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="stylesheet" href="{{ asset('assets/notika/css/bootstrap.min.css') }}">
 
@@ -32,8 +33,8 @@
 
 <body>
     <div
-        class="relative flex min-h-screen text-gray-800 antialiased flex-col justify-center overflow-hidden bg-gray-50 py-6 sm:py-12">
-        <div class="relative py-3 sm:w-96 mx-auto text-center">
+        class="relative flex min-h-screen text-gray-800 antialiased flex-col justify-center overflow-hidden bg-gray-50 py-6 sm:py-12 items-center px-6">
+        <div class="relative py-3 sm:w-96 w-full text-center">
             @php
                 $segments = request()->segments();
                 $currentLocale = $segments[0] ?? 'lv';

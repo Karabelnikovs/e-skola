@@ -14,6 +14,13 @@
                 'forgot_password' => 'Forgot Your Password?',
                 'main_lang' => 'Primary Language',
                 'lang' => 'English',
+                'length_error' => 'The name must be at least 2 characters long.',
+                'error' => 'Error',
+                'email_error' => 'Please enter a valid email address.',
+                'password_error' => 'The password must be at least 8 characters long.',
+                'confirm_error' => 'The password confirmation does not match.',
+                'unique_error' => 'The email address has already been taken.',
+                'bad_email' => 'Email is invalid or cannot receive emails. Try a different one.',
             ],
             'lv' => [
                 'email' => 'E-pasts',
@@ -27,6 +34,13 @@
                 'forgot_password' => 'Aizmirsāt paroli?',
                 'main_lang' => 'Pamatvaloda',
                 'lang' => 'Latviešu',
+                'length_error' => 'Vārdam ir jābūt vismaz 2 rakstzīmēm garam.',
+                'error' => 'Kļūda',
+                'email_error' => 'Lūdzu, ievadiet derīgu e-pasta adresi.',
+                'password_error' => 'Parolei ir jābūt vismaz 8 rakstzīmēm garai.',
+                'confirm_error' => 'Paroles apstiprinājums nesakrīt.',
+                'unique_error' => 'E-pasta adrese jau ir aizņemta.',
+                'bad_email' => 'E-pasts ir nederīgs vai nevar saņemt e-pastus. Mēģiniet citu.',
             ],
             'ru' => [
                 'email' => 'Электронная почта',
@@ -40,6 +54,14 @@
                 'forgot_password' => 'Забыли пароль?',
                 'main_lang' => 'Основной язык',
                 'lang' => 'Русский',
+                'length_error' => 'Имя должно содержать не менее 2 символов.',
+                'error' => 'Ошибка',
+                'email_error' => 'Пожалуйста, введите действительный адрес электронной почты.',
+                'password_error' => 'Пароль должен содержать не менее 8 символов.',
+                'confirm_error' => 'Подтверждение пароля не совпадает.',
+                'unique_error' => 'Электронная почта уже занята.',
+                'bad_email' =>
+                    'Электронная почта недействительна или не может получать электронные письма. Попробуйте другую.',
             ],
             'ua' => [
                 'email' => 'Електронна пошта',
@@ -53,6 +75,13 @@
                 'forgot_password' => 'Забули пароль?',
                 'main_lang' => 'Основна мова',
                 'lang' => 'Українська',
+                'length_error' => 'Ім\'я повинно містити не менше 2 символів.',
+                'error' => 'Помилка',
+                'email_error' => 'Будь ласка, введіть дійсну електронну адресу.',
+                'password_error' => 'Пароль повинен містити не менше 8 символів.',
+                'confirm_error' => 'Підтвердження пароля не збігається.',
+                'unique_error' => 'Електронна пошта вже зайнята.',
+                'bad_email' => 'Електронна пошта недійсна або не може отримувати електронні листи. Спробуйте іншу.',
             ],
         ];
         $lang = Session::get('lang', 'en');
@@ -79,13 +108,31 @@
             <div class="h-2 bg-purple-400 rounded-t-md"></div>
             <div class="px-8 py-6">
                 @if ($errors->any())
-                    <div class="text-red-500 mb-4">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                    @if (collect($errors->all())->contains(__('validation.unique')))
+                        <script>
+                            Swal.fire({
+                                icon: 'error',
+                                title: `{{ $translations[$lang]['error'] }}!`,
+                                html: `{{ $translations[$lang]['unique_error'] }}`
+                            });
+                        </script>
+                    @elseif (collect($errors->all())->contains(__('bad_email')))
+                        <script>
+                            Swal.fire({
+                                icon: 'error',
+                                title: `{{ $translations[$lang]['error'] }}!`,
+                                html: `{{ $translations[$lang]['bad_email'] }}`
+                            });
+                        </script>
+                    @else
+                        <script>
+                            Swal.fire({
+                                icon: 'error',
+                                title: `{{ $translations[$lang]['error'] }}!`,
+                                html: `{!! implode('<br>', $errors->all()) !!}`
+                            });
+                        </script>
+                    @endif
                 @endif
 
                 <div id="errorModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
@@ -171,22 +218,38 @@
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
             if (name.length < 2) {
-                showErrorModal('{{ $translations[$lang]['name'] }} must be at least 2 characters long');
+                Swal.fire({
+                    icon: 'error',
+                    title: `{{ $translations[$lang]['error'] }}!`,
+                    html: `{{ $translations[$lang]['length_error'] }}`
+                });
                 return false;
             }
 
             if (!emailRegex.test(email)) {
-                showErrorModal('Please enter a valid {{ $translations[$lang]['email'] }}');
+                Swal.fire({
+                    icon: 'error',
+                    title: `{{ $translations[$lang]['error'] }}!`,
+                    html: `{{ $translations[$lang]['email_error'] }}`
+                });
                 return false;
             }
 
             if (password.length < 8) {
-                showErrorModal('{{ $translations[$lang]['password'] }} must be at least 8 characters long');
+                Swal.fire({
+                    icon: 'error',
+                    title: `{{ $translations[$lang]['error'] }}!`,
+                    html: `{{ $translations[$lang]['password_error'] }}`
+                });
                 return false;
             }
 
             if (password !== passwordConfirmation) {
-                showErrorModal('{{ $translations[$lang]['confirm_password'] }} does not match');
+                Swal.fire({
+                    icon: 'error',
+                    title: `{{ $translations[$lang]['error'] }}!`,
+                    html: `{{ $translations[$lang]['confirm_error'] }}`
+                });
                 return false;
             }
 

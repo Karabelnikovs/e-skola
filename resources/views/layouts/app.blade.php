@@ -56,6 +56,9 @@
             'certificates' => 'Certificates',
             'profile' => 'Profile',
             'dictionaries' => 'Dictionaries',
+            'contact' => 'Contact',
+            'privacy' => 'Privacy Policy',
+            'terms' => 'Terms',
         ],
         'lv' => [
             'logout' => 'Iziet',
@@ -65,6 +68,9 @@
             'certificates' => 'Sertifikāti',
             'profile' => 'Profils',
             'dictionaries' => 'Vārdnīcas',
+            'contact' => 'Kontakti',
+            'privacy' => 'Privātuma politika',
+            'terms' => 'Noteikumi',
         ],
         'ru' => [
             'logout' => 'Выйти',
@@ -74,6 +80,9 @@
             'certificates' => 'Сертификаты',
             'profile' => 'Профиль',
             'dictionaries' => 'Словари',
+            'contact' => 'Контакты',
+            'privacy' => 'Политика конфиденциальности',
+            'terms' => 'Условия',
         ],
         'ua' => [
             'logout' => 'Вийти',
@@ -83,6 +92,9 @@
             'certificates' => 'Сертифікати',
             'profile' => 'Профіль',
             'dictionaries' => 'Словники',
+            'contact' => 'Контакти',
+            'privacy' => 'Політика конфіденційності',
+            'terms' => 'Умови',
         ],
     ];
     $lang = Session::get('lang', 'lv');
@@ -105,13 +117,99 @@
     .logo-app:hover {
         color: #a78bfa !important;
     }
+
+    .main-panel {
+        width: 100% !important;
+    }
+
+    .main-header {
+        width: 100% !important;
+    }
+
+    .language-switcher {
+        background: rgba(255, 255, 255, 0.1);
+        color: black;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+        min-width: 40px;
+    }
+
+    .language-switcher:hover {
+        background: rgba(152, 16, 250, 0.2);
+        border-color: #9810fa;
+        color: #9810fa;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(152, 16, 250, 0.2);
+    }
+
+    .language-switcher.active {
+        background: linear-gradient(135deg, #9810fa, #7c0dd6);
+        color: white !important;
+        border-color: transparent;
+        box-shadow: 0 2px 12px rgba(152, 16, 250, 0.4);
+    }
+
+    .language-switcher.active:hover {
+        transform: none;
+    }
+
+    @media (max-width: 991px) {
+        .pc-switcher.navbar-brand {
+            display: none !important;
+        }
+
+        .language-switcher {
+            color: white !important;
+        }
+    }
+
+    .language-switcher {
+        height: 38px;
+        min-width: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-profile {
+        background-color: #9810fa !important;
+        color: white !important;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-profile:hover {
+        background: rgba(152, 16, 250, 0.2) !important;
+        border-color: #9810fa !important;
+        color: #9810fa !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(152, 16, 250, 0.2) !important;
+    }
+
+    .btn-profile.active {
+        background: linear-gradient(135deg, #9810fa, #7c0dd6) !important;
+        color: white !important;
+        border-color: transparent !important;
+        box-shadow: 0 2px 12px rgba(152, 16, 250, 0.4) !important;
+    }
+
+    .underline {
+        width: 100px;
+        height: 3px;
+        background: linear-gradient(90deg, #9810FA 0%, rgba(13, 110, 253, 0) 70%);
+        margin: 1rem 0;
+    }
 </style>
 
 <body>
 
     <div class="wrapper">
         <!-- Sidebar -->
-        <div class="sidebar" data-background-color="dark">
+        {{-- <div class="sidebar" data-background-color="dark">
             <div class="sidebar-logo">
                 <!-- Logo Header -->
                 <div class="logo-header" data-background-color="dark">
@@ -206,26 +304,39 @@
                     </ul>
                 </div>
             </div>
-        </div>
+        </div> --}}
         <!-- End Sidebar -->
+
 
         <div class="main-panel">
             <div class="main-header">
                 <div class="main-header-logo">
                     <!-- Logo Header -->
                     <div class="logo-header" data-background-color="dark">
-                        <a href="index.html" class="logo">
-                            <img src="{{ asset('assets/admin/assets/img/kaiadmin/logo_light.svg') }}"
-                                alt="navbar brand" class="navbar-brand" height="20" />
-                        </a>
-                        <div class="nav-toggle">
+                        <div class="navbar-brand d-flex align-items-center gap-3 justify-content-center mx-3  py-3">
+                            @php
+                                $segments = request()->segments();
+                                $currentLocale = $segments[0] ?? 'lv';
+                                $pathWithoutLocale = implode('/', array_slice($segments, 1));
+                                $queryString = request()->getQueryString() ? '?' . request()->getQueryString() : '';
+                            @endphp
+
+                            @foreach (config('locale.supported') as $language)
+                                <a href="{{ url("/$language/$pathWithoutLocale$queryString") }}"
+                                    class="language-switcher d-flex align-items-center justify-content-center text-decoration-none 
+                  rounded-pill px-2 transition-all {{ $currentLocale == $language ? 'active' : '' }}">
+                                    <span class="fw-semibold">{{ strtoupper($language) }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                        {{-- <div class="nav-toggle">
                             <button class="btn btn-toggle toggle-sidebar">
                                 <i class="gg-menu-right"></i>
                             </button>
                             <button class="btn btn-toggle sidenav-toggler">
                                 <i class="gg-menu-left"></i>
                             </button>
-                        </div>
+                        </div> --}}
                         <button class="topbar-toggler more">
                             <i class="gg-more-vertical-alt"></i>
                         </button>
@@ -233,7 +344,7 @@
                     <!-- End Logo Header -->
                 </div>
                 <!-- Navbar Header -->
-                <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
+                <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom px-4">
                     <div class="container-fluid">
                         <a href="/" class="logo d-flex align-items-center">
                             <img src="https://vizii.lv/urban/wp-content/uploads/sites/2/2021/09/cropped-vizii_fav-32x32.png"
@@ -241,7 +352,25 @@
                             <h3 class="fw-bold mt-2 text-black">Vizii
                                 E-Skola</h3>
                         </a>
-                        <div class="">
+                        <div class="navbar-brand d-flex align-items-center gap-3 justify-content-center pc-switcher">
+                            @php
+                                $segments = request()->segments();
+                                $currentLocale = $segments[0] ?? 'lv';
+                                $pathWithoutLocale = implode('/', array_slice($segments, 1));
+                                $queryString = request()->getQueryString() ? '?' . request()->getQueryString() : '';
+                            @endphp
+
+                            @foreach (config('locale.supported') as $language)
+                                <a href="{{ url("/$language/$pathWithoutLocale$queryString") }}"
+                                    class="language-switcher d-flex align-items-center justify-content-center text-decoration-none rounded-pill px-2 transition-all {{ $currentLocale == $language ? 'active' : '' }}">
+                                    <span class="fw-semibold">{{ strtoupper($language) }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{{ route($lang . '.profile') }}" class="btn btn-round btn-profile">
+                                <i class="fa-solid fa-user-alt"></i>
+                            </a>
                             <form method="POST" action="{{ route($lang . '.logout') }}">
                                 @csrf
 
@@ -285,14 +414,32 @@
                 </div>
             </div>
 
+
+
+
             <footer class="footer">
-                <div class=" w-full flex justify-center align-center">
+                <div class="container-fluid d-flex justify-content-between">
+                    <nav class="pull-left">
+                        <ul class="nav">
+                            <li class="nav-item">
+                                <a class=" text-primary ms-1"
+                                    href="{{ route('terms.show') }}">{{ $translations[$lang]['terms'] }}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class=" text-primary ms-1"
+                                    href="{{ route('privacy.show') }}">{{ $translations[$lang]['privacy'] }}</a>
+                            </li>
+                        </ul>
+                    </nav>
 
                     <div class="copyright d-flex justify-content-center align-items-center"><span>
-                            {{ now()->year }}, izstrādātājs </span><a target="_blank"
-                            class="nav-link text-primary ms-1" href="http://www.devera.lv">Devera.lv</a>
+                            {{ now()->year }}, izstrādātājs </span><a target="_blank" class=" text-primary ms-1"
+                            href="http://www.devera.lv">Devera.lv</a>
                     </div>
-
+                    <div>
+                        <a class=" text-primary ms-1"
+                            href="{{ route('contacts.show') }}">{{ $translations[$lang]['contact'] }}</a>
+                    </div>
                 </div>
             </footer>
         </div>

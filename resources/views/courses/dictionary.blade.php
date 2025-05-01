@@ -5,25 +5,38 @@
         $translations = [
             'lv' => [
                 'title' => 'Vārdnīca',
+                'next' => 'Nākamais',
+                'previous' => 'Iepriekšējais',
             ],
             'en' => [
                 'title' => 'Dictionary',
+                'next' => 'Next',
+                'previous' => 'Previous',
             ],
             'ru' => [
                 'title' => 'Словарь',
+                'next' => 'Следующий',
+                'previous' => 'Предыдущий',
             ],
             'ua' => [
                 'title' => 'Словник',
+                'next' => 'Наступний',
+                'previous' => 'Попередній',
             ],
         ];
 
         $lang = Session::get('lang', 'lv');
     @endphp
     <div class="card-body">
-        <a href="{{ $type == 'module' ? route($lang . '.module.show', $course_id) : route($lang . '.dictionaries.view') }}"
-            class="btn btn-label-info btn-round me-2 mb-3 "><i class="fas fa-arrow-circle-left "></i>
-            Atpakaļ</a>
-        <h1>{{ $title }} | {{ $translations[$lang]['title'] ?? 'Vārdnīca' }}</h1>
+        <a href="{{ route($lang . '.courses.index') }}" class="btn btn-label-info btn-round me-2 mb-3 "><i
+                class="fas fa-arrow-circle-left "></i>
+            Visi moduļi</a>
+        <div class="text-center my-3">
+            <h1 class="display-6 fw-bold text-primary">{{ $title }} |
+                {{ $translations[$lang]['title'] ?? 'Vārdnīca' }}
+            </h1>
+            <div class="underline mx-auto"></div>
+        </div>
         <div class="row px-4">
             @foreach ($items as $item)
                 <div class="card mb-3">
@@ -39,8 +52,8 @@
                         <span class="fs-4">{{ $item->phrase_lv }}</span>
                     </div>
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-4">
+                        <div class="row flex-column flex-md-row">
+                            <div class="col border-0 border-md-end mb-3 mb-md-0">
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="badge mx-0 bg-secondary fw-bold">EN</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" id="flag-icons-gb" viewBox="0 0 640 480"
@@ -56,7 +69,7 @@
                                     <span>{{ $item->phrase_en }}</span>
                                 </div>
                             </div>
-                            <div class="col-4 border-start">
+                            <div class="col border-0 border-md-end mb-3 mb-md-0">
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="badge mx-0 bg-secondary fw-bold">UA</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" id="flag-icons-ua" viewBox="0 0 640 480"
@@ -69,7 +82,7 @@
                                     <span>{{ $item->phrase_ua }}</span>
                                 </div>
                             </div>
-                            <div class="col-4 border-start">
+                            <div class="col">
                                 <div class="d-flex align-items-center gap-2">
                                     <span class="badge mx-0 bg-secondary fw-bold">RU</span>
                                     <svg xmlns="http://www.w3.org/2000/svg" id="flag-icons-ru" viewBox="0 0 640 480"
@@ -82,11 +95,29 @@
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             @endforeach
 
-
+            <div class="d-flex justify-content-between mt-5">
+                @if ($order_status != 'first')
+                    <form action="{{ route('courses.module.previous', ['id' => $course_id]) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="btn btn-label-info btn-round me-2 mb-3"><i
+                                class="fas fa-angle-left"></i>
+                            {{ $translations[$lang]['previous'] }}</button>
+                    </form>
+                @endif
+                @if ($order_status != 'last')
+                    <form action="{{ route('courses.module.next', ['id' => $course_id]) }}" method="POST"
+                        class="{{ $order_status == 'first' ? 'absolute-next' : '' }}">
+                        @csrf
+                        <button type="submit" class="btn btn-label-info btn-round me-2 mb-3">
+                            {{ $translations[$lang]['next'] }} <i class="fas fa-angle-right"></i></button>
+                    </form>
+                @endif
+            </div>
 
 
 

@@ -11,6 +11,9 @@ use App\Models\Test;
 use App\Models\Question;
 use Illuminate\Support\Facades\Http;
 use Stichoza\GoogleTranslate\GoogleTranslate;
+use App\Models\Contacts;
+use App\Models\Terms;
+use App\Models\Privacy;
 
 class AdminController extends Controller
 {
@@ -199,7 +202,7 @@ class AdminController extends Controller
         $items = $topics->map(function ($topic) {
             return ['type' => 'topic', 'id' => $topic->id, 'title' => $topic->title_lv, 'order' => $topic->order];
         })->merge($tests->map(function ($test) {
-            return ['type' => 'test', 'id' => $test->id, 'title' => $test->title_lv, 'order' => $test->order];
+            return ['type' => 'test', 'id' => $test->id, 'title' => $test->title_lv, 'order' => $test->order, 'test_type' => $test->type];
         })->merge(
                     $dictionaries->map(function ($dictionary) {
                         return ['type' => 'dictionary', 'id' => $dictionary->id, 'title' => $dictionary->title_lv, 'order' => $dictionary->order];
@@ -907,5 +910,111 @@ class AdminController extends Controller
 
 
         return view('admin.certificates.certificates', compact('certificates', 'courses', 'title', 'user'));
+    }
+
+    public function contacts()
+    {
+        $courses = DB::table('courses')->get();
+        $title = 'Kontakti';
+        $contacts = Contacts::first();
+
+        return view('admin.contact_form', compact('title', 'courses', 'contacts'));
+    }
+    public function storeContacts(Request $request)
+    {
+        $data = $request->validate([
+            'addresses' => 'array|max:4',
+            'addresses.*' => 'string',
+            'emails' => 'array|max:4',
+            'emails.*' => 'email',
+            'phones' => 'array|max:4',
+            'phones.*' => 'string|max:50',
+        ]);
+
+        Contacts::updateOrCreate(['id' => 1], [
+            'phone_numbers' => json_encode($request->phones),
+            'emails' => json_encode($request->emails),
+            'addresses' => json_encode($request->addresses),
+            'updated_at' => now(),
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+
+
+
+    public function useTerms()
+    {
+        if (!session('is_admin')) {
+            return redirect()->route('courses.index');
+        }
+        $courses = DB::table('courses')->get();
+
+        $title = 'Lietošanas noteikumi';
+        $terms = Terms::first();
+
+        return view('admin.terms', compact('title', 'courses', 'terms'));
+    }
+
+    public function storeTerms(Request $request)
+    {
+        if (!session('is_admin')) {
+            return redirect()->route('courses.index');
+        }
+        $request->validate([
+            'content_lv' => 'nullable|string',
+            'content_en' => 'nullable|string',
+            'content_ru' => 'nullable|string',
+            'content_ua' => 'nullable|string',
+        ]);
+
+
+        Terms::updateOrCreate(['id' => 1], [
+            'content_lv' => $request->input('content_lv'),
+            'content_en' => $request->input('content_en'),
+            'content_ru' => $request->input('content_ru'),
+            'content_ua' => $request->input('content_ua'),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('rules')->with('success', 'Noteikumi saglabāti!');
+    }
+
+    public function privacy()
+    {
+        if (!session('is_admin')) {
+            return redirect()->route('courses.index');
+        }
+        $courses = DB::table('courses')->get();
+
+        $title = 'Privātuma politika';
+        $privacy = Privacy::first();
+
+        return view('admin.privacy', compact('title', 'courses', 'privacy'));
+    }
+
+    public function storePrivacy(Request $request)
+    {
+        if (!session('is_admin')) {
+            return redirect()->route('courses.index');
+        }
+        $request->validate([
+            'content_lv' => 'nullable|string',
+            'content_en' => 'nullable|string',
+            'content_ru' => 'nullable|string',
+            'content_ua' => 'nullable|string',
+        ]);
+
+
+        Privacy::updateOrCreate(['id' => 1], [
+            'content_lv' => $request->input('content_lv'),
+            'content_en' => $request->input('content_en'),
+            'content_ru' => $request->input('content_ru'),
+            'content_ua' => $request->input('content_ua'),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('privacy')->with('success', 'Privātuma politika saglabāta!');
     }
 }

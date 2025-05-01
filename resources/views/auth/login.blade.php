@@ -14,6 +14,7 @@
                 'forgot_password' => 'Forgot Your Password?',
                 'main_lang' => 'Primary Language',
                 'lang' => 'English',
+                'error' => 'Error',
             ],
             'lv' => [
                 'email' => 'E-pasts',
@@ -27,6 +28,7 @@
                 'forgot_password' => 'Aizmirsāt paroli?',
                 'main_lang' => 'Pamatvaloda',
                 'lang' => 'Latviešu',
+                'error' => 'Kļūda',
             ],
             'ru' => [
                 'email' => 'Электронная почта',
@@ -40,6 +42,7 @@
                 'forgot_password' => 'Забыли пароль?',
                 'main_lang' => 'Основной язык',
                 'lang' => 'Русский',
+                'error' => 'Ошибка',
             ],
             'ua' => [
                 'email' => 'Електронна пошта',
@@ -53,6 +56,7 @@
                 'forgot_password' => 'Забули пароль?',
                 'main_lang' => 'Основна мова',
                 'lang' => 'Українська',
+                'error' => 'Помилка',
             ],
         ];
         $lang = Session::get('lang', 'lv');
@@ -79,13 +83,13 @@
             <div class="h-2 bg-purple-400 rounded-t-md"></div>
             <div class="px-8 py-6">
                 @if ($errors->any())
-                    <div class="text-red-500 mb-4">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
+                    <script>
+                        Swal.fire({
+                            icon: 'error',
+                            title: `{{ $translations[$lang]['error'] }}!`,
+                            html: `{!! implode('<br>', $errors->all()) !!}`
+                        });
+                    </script>
                 @endif
 
                 <div id="errorModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full"
@@ -117,11 +121,14 @@
                 <div class="flex justify-between items-baseline mb-2">
                     <button type="submit"
                         class="mt-4 bg-purple-500 text-white py-2 px-6 rounded-md hover:bg-purple-600">{{ $translations[$lang]['login'] }}</button>
-                    <a class="text-purple-500 hover:text-purple-600 text-sm"
-                        href="/{{ $lang }}/register">{{ $translations[$lang]['register'] }}</a>
+                    <div class="flex flex-col">
+
+                        <a class="text-purple-500 hover:text-purple-600 text-sm"
+                            href="/{{ $lang }}/register">{{ $translations[$lang]['register'] }}</a>
+                        <a class="text-purple-500 hover:text-purple-600 text-sm mt-2"
+                            href="{{ route($lang . '.password.request') }}">{{ $translations[$lang]['forgot_password'] }}</a>
+                    </div>
                 </div>
-
-
 
             </div>
         </form>

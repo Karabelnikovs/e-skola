@@ -3996,10 +3996,10 @@ label.error {
 
 .btn-label-info {
   background: rgba(72, 171, 247, 0.1);
-  color: #48ABF7 !important;
+  color: #9810fa !important;
   border-color: transparent; }
   .btn-label-info:hover, .btn-label-info:focus, .btn-label-info:disabled {
-    background: #48ABF7;
+    background: #9810fa;
     color: #fff !important;
     opacity: 1; }
 
@@ -4050,8 +4050,8 @@ label.error {
     color: #1a2035 !important;
     border: 1px solid #1a2035 !important; }
   .btn-border.btn-primary {
-    color: #1572E8 !important;
-    border: 1px solid #1572E8 !important; }
+    color: #9810fa !important;
+    border: 1px solid #9810fa !important; }
   .btn-border.btn-secondary {
     color: #6861CE !important;
     border: 1px solid #6861CE !important; }
@@ -6914,3 +6914,9 @@ body {
 
 /*# sourceMappingURL=kaiadmin.css.map */
 
+.absolute-next{
+  position: absolute;
+  right: 10px;
+  bottom: 0;
+  z-index: 1;
+}

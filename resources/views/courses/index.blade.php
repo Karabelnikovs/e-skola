@@ -25,7 +25,11 @@
         // dd($lang);
     @endphp
     <div class="card-body">
-        <h1>{{ $translations[$lang]['title'] ?? 'Pieejamie Moduļi' }}</h1>
+        <div class="text-center my-3">
+            <h1 class="display-6 fw-bold text-primary">{{ $translations[$lang]['title'] ?? 'Pieejamie Moduļi' }}</h1>
+            <div class="underline mx-auto"></div>
+        </div>
+
         <div class="row px-4">
             @foreach ($courses as $course)
                 <div class="card me-4" style="width: 24rem;">

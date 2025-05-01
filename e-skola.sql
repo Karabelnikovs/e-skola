@@ -240,3 +240,80 @@ MODIFY COLUMN `options_lv` TEXT COLLATE 'utf8mb4_unicode_ci',
 MODIFY COLUMN `options_en` TEXT COLLATE 'utf8mb4_unicode_ci',
 MODIFY COLUMN `options_ru` TEXT COLLATE 'utf8mb4_unicode_ci',
 MODIFY COLUMN `options_ua` TEXT COLLATE 'utf8mb4_unicode_ci';
+
+
+CREATE TABLE `password_reset_tokens` (
+  `email` VARCHAR(255) NOT NULL,
+  `token` VARCHAR(255) NOT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT NULL,
+  INDEX (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE users
+ADD COLUMN remember_token VARCHAR(100) NULL AFTER PASSWORD;
+
+CREATE TABLE `user_progress` (
+    `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `user_id` BIGINT UNSIGNED NOT NULL,
+    `course_id` BIGINT UNSIGNED NOT NULL,
+    `current_order` INT UNSIGNED DEFAULT 0,
+    `created_at` TIMESTAMP,
+    `updated_at` TIMESTAMP,
+    FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+    FOREIGN KEY (`course_id`) REFERENCES `courses`(`id`) ON DELETE CASCADE
+);
+
+
+
+CREATE TABLE contacts (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    addresses JSON NULL,
+    phone_numbers JSON NULL,
+    emails JSON NULL,
+    created_at TIMESTAMP NULL DEFAULT NULL,
+    updated_at TIMESTAMP NULL DEFAULT NULL
+);
+
+
+CREATE TABLE terms (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title_lv VARCHAR(255) NOT NULL,
+    title_en VARCHAR(255) NOT NULL,
+    title_ua VARCHAR(255) NOT NULL,
+    title_ru VARCHAR(255) NOT NULL,
+    content_en TEXT NOT NULL,
+    content_lv TEXT NOT NULL,
+    content_ua TEXT NOT NULL,
+    content_ru TEXT NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL
+);
+
+ALTER TABLE terms 
+DROP COLUMN title_lv,
+DROP COLUMN title_en,
+DROP COLUMN title_ru,
+DROP COLUMN title_ua;
+
+CREATE TABLE privacy (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    content_en TEXT NOT NULL,
+    content_lv TEXT NOT NULL,
+    content_ua TEXT NOT NULL,
+    content_ru TEXT NOT NULL,
+    created_at TIMESTAMP NULL,
+    updated_at TIMESTAMP NULL
+);
+
+ALTER TABLE terms
+MODIFY content_en TEXT NULL,
+MODIFY content_lv TEXT NULL,
+MODIFY content_ua TEXT NULL,
+MODIFY content_ru TEXT NULL;
+
+
+ALTER TABLE privacy
+MODIFY content_en TEXT NULL,
+MODIFY content_lv TEXT NULL,
+MODIFY content_ua TEXT NULL,
+MODIFY content_ru TEXT NULL;

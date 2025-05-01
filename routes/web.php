@@ -10,6 +10,10 @@ use App\Http\Controllers\TestController;
 use App\Http\Controllers\AdminController;
 use App\Http\Middleware\AuthCheck;
 use App\Http\Middleware\AdminCheck;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\VerificationController;
+use Illuminate\Support\Facades\Mail;
 
 Route::get('/', [LoginController::class, 'home'])->name('home');
 
@@ -17,6 +21,7 @@ Route::get('/', [LoginController::class, 'home'])->name('home');
 $locales = config('locale.supported');
 foreach ($locales as $locale) {
     Route::prefix($locale)->middleware('web')->group(function () use ($locale) {
+        // default auth
         Route::get('/login', [LoginController::class, 'showLoginForm'])->name($locale . '.login');
         Route::post('/login', [LoginController::class, 'login'])->name($locale . '.login.post');
         Route::post('/logout', [LoginController::class, 'logout'])->name($locale . '.logout');
@@ -24,13 +29,31 @@ foreach ($locales as $locale) {
         Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name($locale . '.register');
         Route::post('/register', [RegisterController::class, 'register'])->name($locale . '.register.post');
 
+        // password reset 
+        Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name($locale . '.password.request');
+        Route::post('password/email', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name($locale . '.password.email');
+        Route::get('password/reset/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+        Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name($locale . '.password.update');
+
+        // email verification 
+        Route::get('email/verify', [VerificationController::class, 'show'])->name($locale . '.verification.notice');
+        Route::get('email/verify/{id}/{hash}', [VerificationController::class, 'verify'])->name($locale . '.verification.verify');
+        Route::post('email/resend', [VerificationController::class, 'resend'])->name($locale . '.verification.resend');
+
         Route::middleware(['AuthCheck'])->group(function () use ($locale) {
+            Route::get('contacts', [CourseController::class, 'showContacts'])->name('contacts.show');
+            Route::get('terms', [CourseController::class, 'showTerms'])->name('terms.show');
+            Route::get('privacy', [CourseController::class, 'showPrivacy'])->name('privacy.show');
+
             Route::get('/', [CourseController::class, 'index'])->name($locale . '.courses.index');
             Route::get('profile', [CourseController::class, 'profile'])->name($locale . '.profile');
             Route::post('profile', [CourseController::class, 'updateProfile'])->name('profile.update');
 
             Route::get('module/{id}', [CourseController::class, 'module'])->name($locale . '.module.show');
-            Route::get('test/{id}', [TestController::class, 'show'])->name($locale . '.test.show');
+            Route::post('/courses/{id}/next', [CourseController::class, 'next'])->name('courses.module.next');
+            Route::post('/courses/{id}/previous', [CourseController::class, 'previous'])->name('courses.module.previous');
+
+            Route::get('test/{id}/{order_status}', [TestController::class, 'show'])->name($locale . '.courses.test');
             Route::post('/test/submit/{id}', [TestController::class, 'submit'])->name($locale . '.test.submit');
             Route::get('test/{id}/result', [TestController::class, 'result'])->name($locale . '.test.result');
             Route::get('/tests', [TestController::class, 'tests'])->name($locale . '.tests');
@@ -38,7 +61,7 @@ foreach ($locales as $locale) {
             Route::get('attempts/{id}', [TestController::class, 'attempts'])->name($locale . '.attempts.view');
             Route::get('attempt/{id}', [TestController::class, 'attempt'])->name($locale . '.attempt.view');
 
-            Route::get('topic/{id}/{type}', [TopicController::class, 'topic'])->name($locale . '.topic.view');
+            Route::get('topic/{id}/{order_status}', [TopicController::class, 'topic'])->name($locale . '.courses.topic');
             Route::get('topics', [TopicController::class, 'topics'])->name($locale . '.topics.view');
 
             Route::get('certificate/{id}', [CertificateController::class, 'certificate'])->name($locale . '.certificate.show');
@@ -46,7 +69,7 @@ foreach ($locales as $locale) {
             Route::get('certificate/download/{userID}/{courseID}', [CertificateController::class, 'download'])->name('certificate.download');
 
             Route::get('dictionaries', [CourseController::class, 'dictionaries'])->name($locale . '.dictionaries.view');
-            Route::get('/dictionary/{id}/{type}', [CourseController::class, 'dictionary'])->name($locale . '.dictionary.view');
+            Route::get('/dictionary/{id}/{order_status}', [CourseController::class, 'dictionary'])->name($locale . '.courses.dictionary');
         });
     });
 }
@@ -102,6 +125,16 @@ Route::middleware(['AdminCheck'])->group(function () {
     Route::get('tests/history/{id}', [AdminController::class, 'testsHistory'])->name('tests.history');
     Route::get('test/attempts/{id}/{userID}', [AdminController::class, 'attempts'])->name('test.attempts');
     Route::get('test/attempt/{id}', [AdminController::class, 'attempt'])->name('test.attempt');
+
+
+    Route::get('contacts', [AdminController::class, 'contacts'])->name('contacts');
+    Route::post('/contact-section/store', [AdminController::class, 'storeContacts']);
+
+    Route::get('privacy', [AdminController::class, 'privacy'])->name('privacy');
+    Route::post('privacy/store', [AdminController::class, 'storePrivacy'])->name('privacy.store');
+
+    Route::get('rules', [AdminController::class, 'useTerms'])->name('rules');
+    Route::post('rules/store', [AdminController::class, 'storeTerms'])->name('rules.store');
 });
 
 Route::get('/error', function () {
@@ -114,4 +147,11 @@ Route::get('/in-development', function () {
     return view('in_progress');
 })->name('development');
 
+Route::get('/test-email', function () {
+    Mail::raw('Test email from Laravel', function ($message) {
+        $message->to('nikolajlivshic@gmail.com')
+            ->subject('Test Email');
+    });
 
+    return 'Email sent';
+});

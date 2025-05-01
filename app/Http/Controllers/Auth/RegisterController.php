@@ -10,6 +10,11 @@ use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
+use App\Mail\WelcomeEmail;
+use PhpParser\Node\Stmt\Switch_;
 
 class RegisterController extends Controller
 {
@@ -34,6 +39,8 @@ class RegisterController extends Controller
 
     public function showRegistrationForm()
     {
+        // dd('showRegistrationForm');
+
         $lang = session('lang', 'en');
         $titles = [
             'lv' => 'Reģistrācija',
@@ -47,19 +54,64 @@ class RegisterController extends Controller
 
     protected function create(array $data)
     {
-        return User::create([
+        $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'role' => 'user',
-            'main_lang' => $data['main_lang'],
+            'language' => $data['main_lang'],
         ]);
+
+        try {
+            Mail::to($user->email)->send(new WelcomeEmail($user));
+        } catch (\Exception $e) {
+            logger()->error('Failed to send welcome email: ' . $e->getMessage());
+            $user->delete();
+            $lang = $user->language ?? 'lv';
+            switch ($lang) {
+                case 'ua':
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'bad_email' => 'Електронна адреса недійсна або не може отримувати електронні листи. Спробуйте іншу.'
+                    ]);
+                case 'ru':
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'bad_email' => 'Электронная почта недействительна или не может получать электронные письма. Попробуйте другой.'
+                    ]);
+                case 'lv':
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'bad_email' => 'E-pasts ir nederīgs vai nevar saņemt e-pastus. Mēģiniet citu.'
+                    ]);
+                default:
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'bad_email' => 'Email is invalid or cannot receive emails. Try a different one.'
+                    ]);
+            }
+
+
+        }
+
+        return $user;
     }
+
+
 
     protected function registered(Request $request, $user)
     {
-        Session::put('lang', $user->main_lang);
+        // dd('registered');
 
-        return redirect()->route($user->main_lang . '.courses.index', ['lang' => $user->main_lang])->with('success', __('Registration successful!'));
+        Session::put('lang', $user->language);
+        $credentials = $user->only('email', 'password');
+        if (Auth::attempt($credentials)) {
+            $user = User::where('email', $credentials['email'])->first();
+            if ($user && $user->role === 'admin') {
+                session(['is_admin' => true]);
+            } else {
+                session(['is_admin' => false]);
+            }
+
+            return redirect()->intended('/' . session('lang', 'lv'));
+        }
+        $lang = $user->language ?? 'lv';
+        return redirect('/' . $lang);
     }
 }

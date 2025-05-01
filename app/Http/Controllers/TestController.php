@@ -20,7 +20,7 @@ class TestController extends Controller
         return $request->session()->get('test_key');
     }
 
-    public function show($id)
+    public function show($id, $order_status)
     {
         $lang = Session::get('lang', 'lv');
         $test = DB::table('tests')->where('id', $id)->first();
@@ -32,9 +32,10 @@ class TestController extends Controller
         $course_id = $test->course_id;
         $questions = DB::table('questions')->where('test_id', $id)->orderBy('order')->get();
 
-        $title = $topic->{'title_' . Session::get('lang', 'lv')} ?? $test->title_en;
+        $lang = Session::get('lang', 'lv');
+        $title = $topic->{'title_' . $lang} ?? $test->title_en;
 
-        return view('courses.test', compact('id', 'test', 'courses', 'course_id', 'title', 'questions'));
+        return view('courses.test', compact('id', 'test', 'courses', 'course_id', 'title', 'questions', 'order_status'));
     }
 
 
@@ -127,6 +128,7 @@ class TestController extends Controller
                 'updated_at' => now(),
             ]);
         }
+        $certificateUrl = null;
 
         if ($passed && $test->type === 'final') {
             $courseId = $test->course_id;
@@ -171,13 +173,25 @@ class TestController extends Controller
                     'updated_at' => $issuedAt,
                     'is_read' => 0,
                 ]);
+                $certificate = DB::table('certificates')
+                    ->where('user_id', $user->id)
+                    ->where('course_id', $courseId)
+                    ->first();
             }
+            if ($certificate) {
+                $certificateUrl = route('certificate.download', [
+                    'userID' => $user->id,
+                    'courseID' => $courseId
+                ]);
+            }
+
         }
 
         return response()->json([
             'score' => $score,
             'passed' => $passed,
-            'percentage' => round($percentageScore, 2)
+            'percentage' => round($percentageScore, 2),
+            'certificate_url' => $certificateUrl
         ]);
     }
 

@@ -33,19 +33,20 @@
                         vārdnīca</a>
                 </div>
             </div>
-
             <ul id="items-list" style="list-style-type: none; padding: 20px;">
                 @foreach ($items as $item)
-                    <li style="margin: 10px 0; padding: 10px; border-radius: 15px; background-color: #e9e9e9; cursor: move;"
+                    <li style="margin: 10px 0; padding: 10px; border-radius: 15px; background-color: #e9e9e9; cursor: move; @if ($item['type'] == 'topic') background-color: #d1e7dd; @elseif($item['type'] == 'test' && $item['test_type'] == 'final') background-color: #f8d7da; @elseif($item['type'] == 'test') background-color: #fff3cd; @endif"
                         data-id="{{ $item['id'] }}" data-type="{{ $item['type'] }}">
                         <div class="d-flex align-items-center flex-column flex-md-row">
-                            <h3>{{ $item['title'] }} ( @if ($item['type'] == 'topic')
+                            <h3 class="my-0 mx-2">{{ $item['title'] }} (
+                                @if ($item['type'] == 'topic')
                                     Tēma
                                 @elseif($item['type'] == 'test')
                                     Tests
                                 @elseif($item['type'] == 'dictionary')
                                     Vārdnīca
-                                @endif)</h3>
+                                @endif)
+                            </h3>
                             <div class="ms-md-auto py-2 py-md-0">
                                 @if ($item['type'] == 'topic')
                                     <a href="{{ route('topic.edit', [$item['id'], $module->id]) }}"
