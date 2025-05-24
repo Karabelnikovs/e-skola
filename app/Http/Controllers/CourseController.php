@@ -73,8 +73,21 @@ class CourseController extends Controller
             ['current_order' => 0]
         );
 
+        switch ($lang) {
+            case 'ua':
+                $message = 'Модуль порожній...';
+                break;
+            case 'ru':
+                $message = 'Модуль пуст...';
+                break;
+            case 'lv':
+                $message = 'Modulis ir tukšs...';
+                break;
+            default:
+                $message = 'Module is empty...';
+        }
         if (empty($orders)) {
-            return redirect()->route($lang . '.courses.index')->with('error', 'Module is empty');
+            return redirect()->route($lang . '.courses.index')->with('error', $message);
         }
 
         $currentOrder = $userProgress->current_order;

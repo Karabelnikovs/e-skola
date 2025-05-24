@@ -59,6 +59,7 @@
             'contact' => 'Contact',
             'privacy' => 'Privacy Policy',
             'terms' => 'Terms',
+            'error_title' => 'Error',
         ],
         'lv' => [
             'logout' => 'Iziet',
@@ -71,6 +72,7 @@
             'contact' => 'Kontakti',
             'privacy' => 'Privātuma politika',
             'terms' => 'Noteikumi',
+            'error_title' => 'Kļūda',
         ],
         'ru' => [
             'logout' => 'Выйти',
@@ -83,6 +85,7 @@
             'contact' => 'Контакты',
             'privacy' => 'Политика конфиденциальности',
             'terms' => 'Условия',
+            'error_title' => 'Ошибка',
         ],
         'ua' => [
             'logout' => 'Вийти',
@@ -95,6 +98,7 @@
             'contact' => 'Контакти',
             'privacy' => 'Політика конфіденційності',
             'terms' => 'Умови',
+            'error_title' => 'Помилка',
         ],
     ];
     $lang = Session::get('lang', 'lv');
@@ -394,14 +398,14 @@
                 <script>
                     Swal.fire({
                         icon: 'error',
-                        title: 'Kļūda!',
+                        title: '{{ $translations[$lang]['error_title'] }}',
                         html: `{!! implode('<br>', $errors->all()) !!}`
                     });
                 </script>
             @endif
             @if (session('error'))
                 <script>
-                    Swal.fire('Kļūda!', '{{ session('error') }}', 'error');
+                    Swal.fire('{{ $translations[$lang]['error_title'] }}', '{{ session('error') }}', 'error');
                 </script>
             @endif
 
