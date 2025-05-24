@@ -88,7 +88,7 @@
             </form>
             <div class="d-flex justify-content-between mt-5">
                 @if ($order_status != 'first')
-                    <form action="{{ route('courses.module.previous', ['id' => $course_id]) }}" method="POST">
+                    <form action="{{ route($lang . '.courses.module.previous', ['id' => $course_id]) }}" method="POST">
                         @csrf
                         <button type="submit" class="btn btn-label-info btn-round me-2 mb-3"><i
                                 class="fas fa-angle-left"></i>
@@ -96,7 +96,7 @@
                     </form>
                 @endif
                 @if ($order_status != 'last')
-                    <form action="{{ route('courses.module.next', ['id' => $course_id]) }}" method="POST"
+                    <form action="{{ route($lang . '.courses.module.next', ['id' => $course_id]) }}" method="POST"
                         class="{{ $order_status == 'first' ? 'absolute-next' : '' }}">
                         @csrf
                         <button type="submit" class="btn btn-label-info btn-round me-2 mb-3">

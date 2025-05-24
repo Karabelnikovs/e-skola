@@ -317,3 +317,9 @@ MODIFY content_en TEXT NULL,
 MODIFY content_lv TEXT NULL,
 MODIFY content_ua TEXT NULL,
 MODIFY content_ru TEXT NULL;
+
+
+ALTER TABLE `user_progress`
+ADD COLUMN `first_notification_sent_at` TIMESTAMP NULL DEFAULT NULL,
+ADD COLUMN `second_notification_sent_at` TIMESTAMP NULL DEFAULT NULL;
+

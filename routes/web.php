@@ -41,17 +41,18 @@ foreach ($locales as $locale) {
         Route::post('email/resend', [VerificationController::class, 'resend'])->name($locale . '.verification.resend');
 
         Route::middleware(['AuthCheck'])->group(function () use ($locale) {
-            Route::get('contacts', [CourseController::class, 'showContacts'])->name('contacts.show');
-            Route::get('terms', [CourseController::class, 'showTerms'])->name('terms.show');
-            Route::get('privacy', [CourseController::class, 'showPrivacy'])->name('privacy.show');
+            Route::get('contacts', [CourseController::class, 'showContacts'])->name($locale . '.contacts.show');
+            Route::get('terms', [CourseController::class, 'showTerms'])->name($locale . '.terms.show');
+            Route::get('privacy', [CourseController::class, 'showPrivacy'])->name($locale . '.privacy.show');
 
             Route::get('/', [CourseController::class, 'index'])->name($locale . '.courses.index');
+
             Route::get('profile', [CourseController::class, 'profile'])->name($locale . '.profile');
             Route::post('profile', [CourseController::class, 'updateProfile'])->name('profile.update');
 
             Route::get('module/{id}', [CourseController::class, 'module'])->name($locale . '.module.show');
-            Route::post('/courses/{id}/next', [CourseController::class, 'next'])->name('courses.module.next');
-            Route::post('/courses/{id}/previous', [CourseController::class, 'previous'])->name('courses.module.previous');
+            Route::post('/courses/{id}/next', [CourseController::class, 'next'])->name($locale . '.courses.module.next');
+            Route::post('/courses/{id}/previous', [CourseController::class, 'previous'])->name($locale . '.courses.module.previous');
 
             Route::get('test/{id}/{order_status}', [TestController::class, 'show'])->name($locale . '.courses.test');
             Route::post('/test/submit/{id}', [TestController::class, 'submit'])->name($locale . '.test.submit');

@@ -270,7 +270,6 @@ class CourseController extends Controller
     public function profile()
     {
         $lang = Session::get('lang', 'lv');
-
         $user = auth()->user();
         $courses = Course::all();
         switch ($lang) {
@@ -328,6 +327,7 @@ class CourseController extends Controller
     public function showContacts()
     {
         $lang = Session::get('lang', 'lv');
+
         switch ($lang) {
             case 'ua':
                 $title = 'Контакти';

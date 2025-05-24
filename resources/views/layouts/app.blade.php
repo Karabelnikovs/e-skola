@@ -425,13 +425,13 @@
                 <div class="container-fluid d-flex justify-content-between">
                     <nav class="pull-left">
                         <ul class="nav">
-                            <li class="nav-item">
+                            <li class="nav-item mx-2">
                                 <a class=" text-primary ms-1"
-                                    href="{{ route('terms.show') }}">{{ $translations[$lang]['terms'] }}</a>
+                                    href="{{ route($lang . '.terms.show') }}">{{ $translations[$lang]['terms'] }}</a>
                             </li>
                             <li class="nav-item">
                                 <a class=" text-primary ms-1"
-                                    href="{{ route('privacy.show') }}">{{ $translations[$lang]['privacy'] }}</a>
+                                    href="{{ route($lang . '.privacy.show') }}">{{ $translations[$lang]['privacy'] }}</a>
                             </li>
                         </ul>
                     </nav>
@@ -441,8 +441,8 @@
                             href="http://www.devera.lv">Devera.lv</a>
                     </div>
                     <div>
-                        <a class=" text-primary ms-1"
-                            href="{{ route('contacts.show') }}">{{ $translations[$lang]['contact'] }}</a>
+                        <a class=" text-primary ms-1 mx-2"
+                            href="{{ route($lang . '.contacts.show') }}">{{ $translations[$lang]['contact'] }}</a>
                     </div>
                 </div>
             </footer>
