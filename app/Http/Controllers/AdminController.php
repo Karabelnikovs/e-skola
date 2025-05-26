@@ -1017,4 +1017,73 @@ class AdminController extends Controller
 
         return redirect()->route('privacy')->with('success', 'Privātuma politika saglabāta!');
     }
+
+    public function usersProgress()
+    {
+        $courses = DB::table('courses')->get();
+        $users = DB::table('users')->orderBy('created_at', 'desc')->get();
+        $title = 'Lietotāju sertifikāti';
+        return view('admin.progress.users', compact('title', 'users', 'courses'));
+    }
+    public function progress($userID)
+    {
+        $courses = DB::table('courses')->get();
+
+        $user = DB::table('users')->where('id', $userID)->first();
+        if (!$user) {
+            return redirect()->route('users-progress')->with('error', 'Lietotājs nav atrasts!');
+        }
+
+        $progress = DB::table('user_progress')
+            ->join('courses', 'user_progress.course_id', '=', 'courses.id')
+            ->select('user_progress.*', 'courses.title_en as course_title_en', 'courses.title_lv as course_title_lv', 'courses.title_ua as course_title_ua', 'courses.title_ru as course_title_ru')
+            ->where('user_progress.user_id', $userID)
+            ->orderBy('user_progress.created_at', 'desc')
+            ->get();
+
+        $courseIds = $progress->pluck('course_id')->unique();
+
+        $testsCounts = DB::table('tests')
+            ->whereIn('course_id', $courseIds)
+            ->select('course_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('course_id')
+            ->get()
+            ->keyBy('course_id');
+
+        $topicsCounts = DB::table('topics')
+            ->whereIn('course_id', $courseIds)
+            ->select('course_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('course_id')
+            ->get()
+            ->keyBy('course_id');
+
+        $dictionariesCounts = DB::table('dictionaries')
+            ->whereIn('course_id', $courseIds)
+            ->select('course_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('course_id')
+            ->get()
+            ->keyBy('course_id');
+
+        $progress->transform(function ($prog) use ($testsCounts, $topicsCounts, $dictionariesCounts) {
+            $courseId = $prog->course_id;
+
+            $tests = $testsCounts[$courseId]->count ?? 0;
+            $topics = $topicsCounts[$courseId]->count ?? 0;
+            $dictionaries = $dictionariesCounts[$courseId]->count ?? 0;
+
+            $totalItems = $tests + $topics + $dictionaries;
+            $percentage = $totalItems > 0
+                ? min(($prog->current_order / $totalItems) * 100, 100)
+                : 0;
+
+            $prog->total_items = $totalItems;
+            $prog->percentage = round($percentage, 2);
+            $prog->completed_items = $prog->current_order;
+
+            return $prog;
+        });
+
+        $title = 'Lietotāja progress';
+        return view('admin.progress.progress', compact('progress', 'title', 'user', 'courses'));
+    }
 }

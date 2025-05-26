@@ -136,6 +136,9 @@ Route::middleware(['AdminCheck'])->group(function () {
 
     Route::get('rules', [AdminController::class, 'useTerms'])->name('rules');
     Route::post('rules/store', [AdminController::class, 'storeTerms'])->name('rules.store');
+
+    Route::get('users-progress', [AdminController::class, 'usersProgress'])->name('users-progress');
+    Route::get('progress/{id}', [AdminController::class, 'progress'])->name('user.progress');
 });
 
 Route::get('/error', function () {

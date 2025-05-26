@@ -168,6 +168,13 @@
                             </a>
                         </li>
 
+                        <li class="nav-item {{ Route::currentRouteName() == 'users-progress' ? 'active' : '' }}">
+                            <a href="{{ route('users-progress') }}">
+                                <i class="fas fa-list-ul"></i>
+                                <p>Lietotāju progress</p>
+                            </a>
+                        </li>
+
 
                     </ul>
                 </div>
