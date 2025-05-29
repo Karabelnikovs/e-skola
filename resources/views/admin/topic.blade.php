@@ -16,13 +16,12 @@
             </script>
         @endif
 
-
         <form method="POST" action="{{ isset($topic) ? route('topic.update', $topic->id) : route('topics.store') }}"
             id="topicForm">
             @csrf
-            {{-- @if (isset($topic))
-                    @method('PUT')
-                @endif --}}
+            @if (isset($topic))
+                @method('POST')
+            @endif
             <a href='/module/{{ $module->id ?? $topic->course_id }}' class="btn btn-label-info btn-round me-2 mb-3"><i
                     class="fas fa-arrow-circle-left "></i>
                 Atpakaļ</a>
@@ -53,7 +52,7 @@
 
             <div class="mb-3">
                 <label class="form-label">Saturs (EN)</label>
-                <textarea name="content_en" id="content_en" class="editor" style="height: 400px;">{{ old('content_en', $topic->content_en ?? '') }}</textarea>
+                <textarea name="content_en" id="content_en" class="editor">{{ old('content_en', $topic->content_en ?? '') }}</textarea>
             </div>
 
             @foreach ($languages as $code => $lang)
@@ -64,40 +63,48 @@
                             data-lang="{{ $code == 'ua' ? 'uk' : $code }}" data-type="content">Tulkot no
                             EN</button>
                     </label>
-                    <textarea name="content_{{ $code }}" id="content_{{ $code == 'ua' ? 'uk' : $code }}" class="editor"
-                        style="height: 400px;">{{ old("content_$code", $topic?->{"content_$code"} ?? '') }}</textarea>
+                    <textarea name="content_{{ $code }}" id="content_{{ $code == 'ua' ? 'uk' : $code }}" class="editor">{{ old("content_$code", $topic?->{"content_$code"} ?? '') }}</textarea>
                 </div>
             @endforeach
 
-            {{-- <div class="mb-3">
-                    <button type="button" id="translateAll" class="btn btn-primary">Translate All from English</button>
-                </div> --}}
-
             <button type="submit" class="btn btn-success btn-round">Saglabāt</button>
         </form>
-
-
-
-
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@5.10.9/tinymce.min.js"></script>
     <script>
-        ClassicEditor
-            .create(document.querySelector('.editor'), {
-                ckfinder: {
-                    uploadUrl: '{{ route('upload.image') }}?&_token={{ csrf_token() }}'
-                }
+        tinymce.init({
+            selector: 'textarea.editor',
+            plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons accordion',
+            toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | image',
+            images_upload_handler: function(blobInfo, success, failure) {
+                const formData = new FormData();
+                formData.append('file', blobInfo.blob(), blobInfo.filename());
 
-            })
-            .then(editor => {
-                editor.editing.view.change(writer => {
-                    writer.setStyle('min-height', '200px', editor.editing.view.document.getRoot());
-                });
-            })
-            .catch(error => {
-                console.error(error);
-            });
+                fetch('{{ route('upload.image') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Upload failed');
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.location) {
+                            success(data.location);
+                        } else {
+                            failure(data.error || 'Upload failed');
+                        }
+                    })
+                    .catch(error => failure(error.message));
+            },
+            height: 400
+        });
     </script>
+
     <script>
         document.getElementById('topicForm').addEventListener('submit', function(e) {
             const title_lv = document.getElementById('title_lv').value.trim();
@@ -123,29 +130,7 @@
         });
     </script>
 
-
-
-    <script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
     <script>
-        const editors = {};
-        const allEditorIDs = ['content_en', 'content_lv', 'content_ru', 'content_uk'];
-
-        Promise.all(allEditorIDs.map(id => {
-            return ClassicEditor.create(document.querySelector('#' + id), {
-                ckfinder: {
-                    uploadUrl: '{{ route('upload.image') }}?&_token={{ csrf_token() }}'
-                }
-
-            }).then(editor => {
-                editors[id] = editor;
-
-                editor.editing.view.change(writer => {
-                    writer.setStyle('min-height', '200px', editor.editing.view.document
-                        .getRoot());
-                });
-            });
-        }));
-
         async function translateField(fromText, toLang) {
             const res = await fetch('{{ route('translate') }}', {
                 method: 'POST',
@@ -166,41 +151,21 @@
         document.querySelectorAll('.translate-btn').forEach(btn => {
             btn.addEventListener('click', async function() {
                 const lang = this.dataset.lang;
-                // const target_lang = lang;
-
                 const type = this.dataset.type;
                 const sourceId = type === 'title' ? 'title_en' : 'content_en';
                 const targetId = type === 'title' ? `title_${lang}` : `content_${lang}`;
-                console.log(lang, type, sourceId, targetId);
 
                 const sourceValue = type === 'title' ?
                     document.getElementById(sourceId).value :
-                    editors[sourceId].getData();
+                    tinymce.get(sourceId).getContent();
 
                 const translated = await translateField(sourceValue, lang);
                 if (type === 'title') {
                     document.getElementById(targetId).value = translated;
                 } else {
-                    editors[targetId].setData(translated);
+                    tinymce.get(targetId).setContent(translated);
                 }
             });
         });
-
-        // document.getElementById('translateAll').addEventListener('click', async function() {
-        //     const langs = ['lv', 'ru', 'uk'];
-
-        //     const titleEN = document.getElementById('title_en').value;
-        //     const contentEN = editors['content_en'].getData();
-
-        //     for (const lang of langs) {
-        //         const titleTrans = await translateField(titleEN, lang);
-        //         document.getElementById(`title_${lang}`).value = titleTrans;
-
-        //         const contentTrans = await translateField(contentEN, lang);
-        //         editors[`content_${lang}`].setData(contentTrans);
-        //     }
-
-        //     Swal.fire('Gatavs!', 'Visi lauki pārtulkoti!', 'success');
-        // });
     </script>
 @endsection

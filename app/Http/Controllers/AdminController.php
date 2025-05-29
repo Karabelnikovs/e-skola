@@ -20,19 +20,19 @@ class AdminController extends Controller
 
     public function uploadImage(Request $request)
     {
-        if ($request->hasFile('upload')) {
-            $file = $request->file('upload');
-            $path = $file->store('uploads', 'public');
+        $request->validate([
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
 
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $path = $file->store('uploads', 'public');
             $url = asset('storage/' . $path);
 
-            return response()->json([
-                'uploaded' => true,
-                'url' => $url
-            ]);
+            return response()->json(['location' => $url]);
         }
 
-        return response()->json(['uploaded' => false]);
+        return response()->json(['error' => 'No file uploaded'], 400);
     }
 
 
