@@ -18,6 +18,7 @@ use App\Models\Privacy;
 class AdminController extends Controller
 {
 
+
     public function uploadImage(Request $request)
     {
         $request->validate([
@@ -26,8 +27,10 @@ class AdminController extends Controller
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $path = $file->store('uploads', 'public');
-            $url = asset('storage/' . $path);
+
+            $path = $file->store('uploads', 'public_uploads');
+
+            $url = asset('storage/uploads/' . basename($path));
 
             return response()->json(['location' => $url]);
         }
