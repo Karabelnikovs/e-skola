@@ -7,21 +7,25 @@
                 'title' => 'Teorija',
                 'next' => 'Nākamais',
                 'previous' => 'Iepriekšējais',
+                'all_modules' => 'Visi moduļi',
             ],
             'en' => [
                 'title' => 'Theory',
                 'next' => 'Next',
                 'previous' => 'Previous',
+                'all_modules' => 'All modules',
             ],
             'ru' => [
                 'title' => 'Теория',
                 'next' => 'Следующий',
                 'previous' => 'Предыдущий',
+                'all_modules' => 'Все модули',
             ],
             'ua' => [
                 'title' => 'Теорія',
                 'next' => 'Наступний',
                 'previous' => 'Попередній',
+                'all_modules' => 'Всі модулі',
             ],
         ];
 
@@ -30,7 +34,8 @@
     <div class="card-body">
         <a href="{{ route($lang . '.courses.index') }}" class="btn btn-label-info btn-round me-2 mb-3 "><i
                 class="fas fa-arrow-circle-left "></i>
-            Visi moduļi</a>
+            {{ $translations[$lang]['all_modules'] }}
+        </a>
         <div class="text-center my-3">
             <h1 class="display-6 fw-bold text-primary">
                 {{ $title }} | {{ $translations[$lang]['title'] ?? 'Teorija' }}

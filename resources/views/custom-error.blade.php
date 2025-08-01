@@ -58,7 +58,7 @@
                         </h1>
                         <p class="my-4 mb-6 text-gray-800">{{ $translations[$lang]['sorry'] }}
                         </p>
-                        <a href="{{ url()->previous() }}"
+                        <a href="/{{ Session::get('lang', 'lv') }}/login"
                             class="sm:w-full lg:w-auto my-2 border rounded md py-4 px-8 text-center bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-700 focus:ring-opacity-50">{{ $translations[$lang]['button'] }}</a>
                     </div>
                 </div>

@@ -10,6 +10,7 @@
                 'next' => 'Nākamais',
                 'previous' => 'Iepriekšējais',
                 'final' => 'Noslēguma tests',
+                'all_modules' => 'Visi moduļi',
             ],
             'en' => [
                 'title' => 'Test',
@@ -18,6 +19,7 @@
                 'next' => 'Next',
                 'previous' => 'Previous',
                 'final' => 'Final Test',
+                'all_modules' => 'All modules',
             ],
             'ru' => [
                 'title' => 'Тест',
@@ -26,6 +28,7 @@
                 'next' => 'Следующий',
                 'previous' => 'Предыдущий',
                 'final' => 'Заключительный тест',
+                'all_modules' => 'Все модули',
             ],
             'ua' => [
                 'title' => 'Тест',
@@ -34,6 +37,7 @@
                 'next' => 'Наступний',
                 'previous' => 'Попередній',
                 'final' => 'Фінальний тест',
+                'all_modules' => 'Всі модулі',
             ],
         ];
 
@@ -43,7 +47,7 @@
     <div class="card-body">
         <a href="{{ route($lang . '.courses.index') }}" class="btn btn-label-info btn-round me-2 mb-3 "><i
                 class="fas fa-arrow-circle-left "></i>
-            Visi moduļi</a>
+            {{ $translations[$lang]['all_modules'] }}</a>
         <div class="text-center my-3">
             <h1 class="display-6 fw-bold text-primary">{{ $title }} | {{ $translations[$lang]['title'] ?? 'Tests' }}
                 @if ($test->type == 'final')
