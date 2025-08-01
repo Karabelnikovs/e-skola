@@ -9,6 +9,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\File;
 use Barryvdh\DomPDF\Facade\Pdf;
+use setasign\Fpdi\Fpdi;
+use setasign\Fpdi\PdfParser\StreamReader;
+use TCPDF;
+
 
 
 class TestController extends Controller
@@ -147,36 +151,66 @@ class TestController extends Controller
                 $certificatePath = 'certificates/user_' . $user->id . '_course_' . $courseId . '.pdf';
                 $fullPath = storage_path('app/public/' . $certificatePath);
 
-                $directory = storage_path('app/public/certificates');
+                $directory = dirname($fullPath);
                 if (!File::exists($directory)) {
                     File::makeDirectory($directory, 0755, true);
                 }
 
                 try {
                     $issuedAt = now();
-                    $pdf = Pdf::loadView('certificate', [
-                        'user' => $user,
-                        'course' => $course,
+
+                    $pdf = new Fpdi();
+                    $templatePath = storage_path('app/public/templates/certificate_template.pdf');
+                    $pdf->setSourceFile(StreamReader::createByFile($templatePath));
+                    $templateId = $pdf->importPage(1);
+
+                    $size = $pdf->getTemplateSize($templateId);
+                    $width = $size['width'];
+                    $height = $size['height'];
+
+
+                    $pdf->addPage('P', [$width, $height]);
+                    $pdf->useTemplate($templateId);
+
+                    $pdf->setFont('Arial', '', 20);
+                    $pdf->setTextColor(0, 0, 0);
+
+                    $userName = iconv('UTF-8', 'windows-1257', $user->name);
+                    $userNameWidth = $pdf->GetStringWidth($userName);
+                    $pdf->text(($width - $userNameWidth) / 2, $height / 2 - 16, $userName);
+
+                    $courseTitle = iconv('UTF-8', 'windows-1257', $course->title_en);
+                    $courseTitleWidth = $pdf->GetStringWidth($courseTitle);
+                    $pdf->text(($width - $courseTitleWidth) / 2, ($height / 2) + 20, $courseTitle);
+
+                    $issueDate = $issuedAt->format('d/m/Y');
+                    $issueDateWidth = $pdf->GetStringWidth($issueDate);
+                    $pdf->text(($width - $issueDateWidth) / 2, ($height / 2) + 40, $issueDate);
+
+
+                    // $pdf->text($width / 2 - 25, $height / 2 - 16, iconv('UTF-8', 'windows-1257', $user->name));
+                    // $pdf->text($width / 2 - 20, ($height / 2) + 20, iconv('UTF-8', 'windows-1257', $course->title_en));
+                    // $pdf->text($width / 2 - 20, ($height / 2) + 40, iconv('UTF-8', 'windows-1257', $issuedAt->format('d/m/Y')));
+
+                    $pdf->output($fullPath, 'F');
+
+                    DB::table('certificates')->insert([
+                        'user_id' => $user->id,
+                        'course_id' => $courseId,
                         'issued_at' => $issuedAt,
+                        'certificate_path' => $certificatePath,
+                        'created_at' => $issuedAt,
+                        'updated_at' => $issuedAt,
+                        'is_read' => 0,
                     ]);
-                    $pdf->save($fullPath);
+
+                    $certificate = DB::table('certificates')
+                        ->where('user_id', $user->id)
+                        ->where('course_id', $courseId)
+                        ->first();
                 } catch (\Exception $e) {
                     return response()->json(['error' => 'Failed to generate certificate: ' . $e->getMessage()], 500);
                 }
-
-                DB::table('certificates')->insert([
-                    'user_id' => $user->id,
-                    'course_id' => $courseId,
-                    'issued_at' => $issuedAt,
-                    'certificate_path' => $certificatePath,
-                    'created_at' => $issuedAt,
-                    'updated_at' => $issuedAt,
-                    'is_read' => 0,
-                ]);
-                $certificate = DB::table('certificates')
-                    ->where('user_id', $user->id)
-                    ->where('course_id', $courseId)
-                    ->first();
             }
             if ($certificate) {
                 $certificateUrl = route('certificate.download', [
