@@ -6,7 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
 
-class FirstIncompleteModuleNotification extends Notification
+class FourthIncompleteModuleNotification extends Notification
 {
     use Queueable;
 
@@ -15,36 +15,36 @@ class FirstIncompleteModuleNotification extends Notification
     protected $translations = [
         'en' => [
             'greeting' => 'Hello!',
-            'subject' => 'Reminder: Complete Your Module',
-            'line1' => 'You have not completed the module ',
-            'line2' => 'It has been 23 hours since your last progress.',
+            'subject' => 'Final Reminder: Complete Your Module',
+            'line1' => 'You still have not completed the module ',
+            'line2' => 'It has been a month since your last progress.',
             'actionText' => 'Continue Module',
             'thankYou' => 'Good luck completing the module!',
             'salutation' => 'Regards, Vizii E-skola',
         ],
         'lv' => [
             'greeting' => 'Sveiki!',
-            'subject' => 'Atgādinājums: Pabeidziet savu moduli',
-            'line1' => 'Jūs neesat pabeidzis moduli ',
-            'line2' => 'Ir pagājušas 23 stundas kopš jūsu pēdējā progresa.',
+            'subject' => 'Pēdējais atgādinājums: Pabeidziet savu moduli',
+            'line1' => 'Jūs joprojām neesat pabeidzis moduli ',
+            'line2' => 'Ir pagājis mēnesis kopš jūsu pēdējā progresa.',
             'actionText' => 'Turpināt moduli',
             'thankYou' => 'Veiksmi pabeidzot moduli!',
             'salutation' => 'Ar cieņu, Vizii E-skola',
         ],
         'ru' => [
             'greeting' => 'Здравствуйте!',
-            'subject' => 'Напоминание: Завершите свой модуль',
-            'line1' => 'Вы не завершили модуль ',
-            'line2' => 'Прошло 23 часа с момента вашего последнего прогресса.',
+            'subject' => 'Финальное напоминание: Завершите свой модуль',
+            'line1' => 'Вы все еще не завершили модуль ',
+            'line2' => 'Прошел месяц с момента вашего последнего прогресса.',
             'actionText' => 'Продолжить модуль',
             'thankYou' => 'Удачи в завершении модуля!',
             'salutation' => 'С уважением, Vizii E-skola',
         ],
         'ua' => [
             'greeting' => 'Вітаємо!',
-            'subject' => 'Нагадування: Завершіть свій модуль',
-            'line1' => 'Ви не завершили модуль ',
-            'line2' => 'Минуло 23 години з моменту вашого останнього прогресу.',
+            'subject' => 'Останнє нагадування: Завершіть свій модуль',
+            'line1' => 'Ви все ще не завершили модуль ',
+            'line2' => 'Минув місяць з моменту вашого останнього прогресу.',
             'actionText' => 'Продовжити модуль',
             'thankYou' => 'Удачі в завершенні модуля!',
             'salutation' => 'З повагою, Vizii E-skola',

@@ -8,11 +8,13 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use App\Notifications\FirstIncompleteModuleNotification;
 use App\Notifications\SecondIncompleteModuleNotification;
+use App\Notifications\ThirdIncompleteModuleNotification;
+use App\Notifications\FourthIncompleteModuleNotification;
 
 class NotifyIncompleteModules extends Command
 {
     protected $signature = 'notify:incomplete-modules';
-    protected $description = 'Send notifications to users who have not completed their modules';
+    protected $description = 'Send notifications to users who have started but not completed their modules';
 
     public function handle()
     {
@@ -28,6 +30,25 @@ class NotifyIncompleteModules extends Command
             $lastOrders[$courseId] = $lastOrder;
         }
 
+        $thresholds = [
+            23 => [
+                'sent_at' => 'first_notification_sent_at',
+                'notification' => FirstIncompleteModuleNotification::class,
+            ],
+            71 => [
+                'sent_at' => 'second_notification_sent_at',
+                'notification' => SecondIncompleteModuleNotification::class,
+            ],
+            168 => [
+                'sent_at' => 'third_notification_sent_at',
+                'notification' => ThirdIncompleteModuleNotification::class,
+            ],
+            720 => [
+                'sent_at' => 'fourth_notification_sent_at',
+                'notification' => FourthIncompleteModuleNotification::class,
+            ],
+        ];
+
         foreach ($userProgresses as $userProgress) {
             $courseId = $userProgress->course_id;
             if (!isset($lastOrders[$courseId]) || $lastOrders[$courseId] === null) {
@@ -35,19 +56,16 @@ class NotifyIncompleteModules extends Command
             }
             $lastOrder = $lastOrders[$courseId];
 
-            if ($userProgress->current_order < $lastOrder) {
-                $hoursSinceUpdate = Carbon::now()->diffInHours($userProgress->updated_at);
+            if ($userProgress->current_order > 0 && $userProgress->current_order < $lastOrder) {
+                $hoursSinceUpdate = Carbon::now()->diffInHours($userProgress->updated_at, true);
 
-                if ($hoursSinceUpdate >= 48 && is_null($userProgress->first_notification_sent_at)) {
-                    $userProgress->user->notify(new FirstIncompleteModuleNotification($userProgress->course));
-                    $userProgress->first_notification_sent_at = Carbon::now();
-                    $userProgress->save();
-                }
+                foreach ($thresholds as $hours => $info) {
 
-                if ($hoursSinceUpdate >= 168 && is_null($userProgress->second_notification_sent_at)) {
-                    $userProgress->user->notify(new SecondIncompleteModuleNotification($userProgress->course));
-                    $userProgress->second_notification_sent_at = Carbon::now();
-                    $userProgress->save();
+                    if ($hoursSinceUpdate >= $hours && is_null($userProgress->{$info['sent_at']})) {
+                        $userProgress->user->notify(new $info['notification']($userProgress->course));
+                        $userProgress->{$info['sent_at']} = Carbon::now();
+                        $userProgress->save();
+                    }
                 }
             }
         }

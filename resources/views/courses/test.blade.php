@@ -11,6 +11,7 @@
                 'previous' => 'Iepriekšējais',
                 'final' => 'Noslēguma tests',
                 'all_modules' => 'Visi moduļi',
+                'disclaimer' => 'Šis tests jau ir nokārtots.',
             ],
             'en' => [
                 'title' => 'Test',
@@ -20,6 +21,7 @@
                 'previous' => 'Previous',
                 'final' => 'Final Test',
                 'all_modules' => 'All modules',
+                'disclaimer' => 'This test is already passed.',
             ],
             'ru' => [
                 'title' => 'Тест',
@@ -29,6 +31,7 @@
                 'previous' => 'Предыдущий',
                 'final' => 'Заключительный тест',
                 'all_modules' => 'Все модули',
+                'disclaimer' => 'Этот тест уже пройден.',
             ],
             'ua' => [
                 'title' => 'Тест',
@@ -38,6 +41,7 @@
                 'previous' => 'Попередній',
                 'final' => 'Фінальний тест',
                 'all_modules' => 'Всі модулі',
+                'disclaimer' => 'Цей тест вже пройдено.',
             ],
         ];
 
@@ -49,13 +53,17 @@
                 class="fas fa-arrow-circle-left "></i>
             {{ $translations[$lang]['all_modules'] }}</a>
         <div class="text-center my-3">
-            <h1 class="display-6 fw-bold text-primary">{{ $title }} | {{ $translations[$lang]['title'] ?? 'Tests' }}
+            <h1 class="display-6 fw-bold text-primary">{{ $title }}
                 @if ($test->type == 'final')
                     | {{ $translations[$lang]['final'] }}
+                @else
+                    | {{ $translations[$lang]['title'] ?? 'Tests' }}
                 @endif
             </h1>
-            </h1>
             <div class="underline mx-auto"></div>
+        </div>
+        <div id="disclaimer" class="alert alert-info" style="display: {{ $passed ? 'block' : 'none' }};">
+            {{ $translations[$lang]['disclaimer'] }}
         </div>
         <div class="row px-4">
             <form id="testForm">
@@ -77,10 +85,11 @@
                                         json_decode($question->{'options_' . $lang}, true) ??
                                         explode(',', $question->{'options_' . $lang});
                                 @endphp
-                                @foreach ($options as $option)
-                                    <label class="list-group-item d-flex align-items-center">
+                                @foreach ($options as $key => $option)
+                                    <label
+                                        class="list-group-item d-flex align-items-center {{ $passed && $key == $question->correct_answer ? 'correct' : '' }} {{ $passed ? 'disabled' : '' }}">
                                         <input type="radio" name="question_{{ $question->id }}"
-                                            value="{{ $option }}" class="me-3">
+                                            {{ $passed ? 'disabled' : '' }} value="{{ $option }}" class="me-3">
                                         <span class="option-text">{{ $option }}</span>
                                     </label>
                                 @endforeach
@@ -88,8 +97,10 @@
                         </div>
                     </div>
                 @endforeach
-                <button type="submit" class="btn btn-primary mt-3 btn-round">{{ $translations[$lang]['submit'] }}</button>
+                <button type="submit" class="btn btn-primary mt-3 btn-round"
+                    {{ $passed ? 'disabled' : '' }}>{{ $translations[$lang]['submit'] }}</button>
             </form>
+            {{-- @dd($order_status) --}}
             <div class="d-flex justify-content-between mt-5">
                 @if ($order_status != 'first')
                     <form action="{{ route($lang . '.courses.module.previous', ['id' => $course_id]) }}" method="POST">
@@ -100,8 +111,9 @@
                     </form>
                 @endif
                 @if ($order_status != 'last')
-                    <form action="{{ route($lang . '.courses.module.next', ['id' => $course_id]) }}" method="POST"
-                        class="{{ $order_status == 'first' ? 'absolute-next' : '' }}">
+                    <form id="nextForm" action="{{ route($lang . '.courses.module.next', ['id' => $course_id]) }}"
+                        method="POST" class="{{ $order_status == 'first' ? 'absolute-next' : '' }}"
+                        style="display: {{ $passed ? 'block' : 'none' }};">
                         @csrf
                         <button type="submit" class="btn btn-label-info btn-round me-2 mb-3">
                             {{ $translations[$lang]['next'] }} <i class="fas fa-angle-right"></i></button>
@@ -133,6 +145,17 @@
 
         .list-group-item.selected .option-text {
             color: white;
+        }
+
+        .list-group-item.disabled {
+            background-color: #eee;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .list-group-item.correct {
+            background-color: lightgreen !important;
+            color: black;
         }
 
         input[type="radio"] {
@@ -201,7 +224,7 @@
                         link.click();
                         link.remove();
                     }
-                    const percentage = ((data.score / numberOfQuestions) * 100).toFixed(1);
+                    const percentage = data.percentage;
                     Swal.fire({
                         title: data.passed ? 'Nokārtots!' : 'Nenokārtots!',
                         html: `Jūsu rezultāts: ${data.score}/${numberOfQuestions} (${percentage}%)<br>` +
@@ -210,10 +233,35 @@
                         icon: data.passed ? 'success' : 'error',
                         confirmButtonText: 'OK'
                     }).then(() => {
-                        document.querySelectorAll('input[type="radio"]').forEach(radio => {
-                            radio.disabled = true;
-                        });
-                        document.querySelector('button[type="submit"]').disabled = true;
+                        if (data.passed) {
+                            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                                radio.disabled = true;
+                            });
+                            document.querySelector('button[type="submit"]').disabled = true;
+                            document.querySelectorAll('.list-group-item').forEach(item => {
+                                item.classList.add('disabled');
+                            });
+                            document.getElementById('disclaimer').style.display = 'block';
+                            if (document.getElementById('nextForm')) {
+                                document.getElementById('nextForm').style.display = 'block';
+                            }
+                            if (data.correct_answers) {
+                                Object.keys(data.correct_answers).forEach(qid => {
+                                    const correct = data.correct_answers[qid];
+                                    const questionDiv = document.querySelector(
+                                        `.question[data-question-id="${qid}"]`);
+                                    if (questionDiv) {
+                                        questionDiv.querySelectorAll('.list-group-item')
+                                            .forEach(item => {
+                                                if (item.querySelector('.option-text')
+                                                    .textContent.trim() === correct) {
+                                                    item.classList.add('correct');
+                                                }
+                                            });
+                                    }
+                                });
+                            }
+                        }
                     });
                 })
                 .catch(error => {

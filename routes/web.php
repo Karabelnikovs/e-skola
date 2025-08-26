@@ -97,6 +97,7 @@ Route::middleware(['AdminCheck'])->group(function () {
     Route::get('/module/create', [AdminController::class, 'create'])->name('module.create');
     Route::post('/module/store', [AdminController::class, 'store'])->name('module.store');
     Route::get('/module/{id}', [AdminController::class, 'module'])->name('module');
+    Route::get('module/delete/{id}', [AdminController::class, 'deleteModule'])->name('module.delete');
 
     Route::get('/module/edit/{id}', [AdminController::class, 'edit'])->name('module.edit');
     Route::post('/module/update/{id}', [AdminController::class, 'update'])->name('module.update');

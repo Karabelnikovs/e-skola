@@ -56,10 +56,12 @@ class CourseController extends Controller
             ->where('course_id', $id)
             ->value('current_order') ?? 0;
 
-
+        // dd($current_order, $orders[0]);
         if ($current_order == $lastOrder) {
             $order_status = 'last';
         } elseif ($current_order == $orders[0]) {
+            $order_status = 'first';
+        } elseif (!in_array($current_order, $orders) && $current_order == 0) {
             $order_status = 'first';
         } else {
             $order_status = 'middle';

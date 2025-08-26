@@ -3,10 +3,13 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
     <div class="card-body">
-
-        <a href='/all-modules' class="btn btn-label-info btn-round me-2 mb-3 "><i class="fas fa-arrow-circle-left "></i>
-
-            Atpakaļ</a>
+        <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
+            <a href='/all-modules' class="btn btn-label-info btn-round me-2 mb-3 "><i class="fas fa-arrow-circle-left "></i>
+                Atpakaļ</a>
+            <a href="{{ route('module.delete', $module->id) }}" onclick="return confirm('Vai esat pārliecināts?')"
+                class="btn btn-label-info btn-round me-2 mb-3 ms-md-auto">
+                Dzēst moduli <i class="fa fa-trash-alt"></i></a>
+        </div>
         <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
             <div>
                 <h1>{{ $module->title_lv }}</h1>
@@ -35,6 +38,7 @@
             </div>
             <ul id="items-list" style="list-style-type: none; padding: 20px;">
                 @foreach ($items as $item)
+                    {{-- @dd($item) --}}
                     <li style="margin: 10px 0; padding: 10px; border-radius: 15px; background-color: #e9e9e9; cursor: move; @if ($item['type'] == 'topic') background-color: #d1e7dd; @elseif($item['type'] == 'test' && $item['test_type'] == 'final') background-color: #f8d7da; @elseif($item['type'] == 'test') background-color: #fff3cd; @endif"
                         data-id="{{ $item['id'] }}" data-type="{{ $item['type'] }}">
                         <div class="d-flex align-items-center flex-column flex-md-row">
@@ -47,6 +51,9 @@
                                     Vārdnīca
                                 @endif)
                             </h3>
+                            @if (isset($item['content_preview']))
+                                <p class="ms-md-auto py-2 py-md-0">{!! $item['content_preview'] !!}</p>
+                            @endif
                             <div class="ms-md-auto py-2 py-md-0">
                                 @if ($item['type'] == 'topic')
                                     <a href="{{ route('topic.edit', [$item['id'], $module->id]) }}"

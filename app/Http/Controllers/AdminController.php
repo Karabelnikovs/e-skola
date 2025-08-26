@@ -143,6 +143,12 @@ class AdminController extends Controller
         return redirect()->route('module.create')->with('success', 'Modulis veiksmīgi izveidots!');
     }
 
+    public function deleteModule($id)
+    {
+        DB::table('courses')->where('id', $id)->delete();
+        return redirect()->route('module.all')->with('success', 'Modulis veiksmīgi izdzēsts!');
+    }
+
     public function update(Request $request)
     {
 
@@ -212,12 +218,12 @@ class AdminController extends Controller
         $dictionaries = DB::table('dictionaries')->where('course_id', $id)->orderBy('order')->get();
 
         $items = $topics->map(function ($topic) {
-            return ['type' => 'topic', 'id' => $topic->id, 'title' => $topic->title_lv, 'order' => $topic->order];
+            return ['type' => 'topic', 'id' => $topic->id, 'title' => $topic->title_lv, 'order' => $topic->order, 'content_preview' => substr(strip_tags($topic->content_lv), 0, 55) . (strlen(strip_tags($topic->content_lv)) > 55 ? '...' : '')];
         })->merge($tests->map(function ($test) {
-            return ['type' => 'test', 'id' => $test->id, 'title' => $test->title_lv, 'order' => $test->order, 'test_type' => $test->type];
+            return ['type' => 'test', 'id' => $test->id, 'title' => $test->title_lv, 'order' => $test->order, 'test_type' => $test->type, 'content_preview' => substr(strip_tags(DB::table('questions')->where('test_id', $test->id)->value('question_lv')), 0, 55) . (strlen(strip_tags('')) > 55 ? '...' : '')];
         })->merge(
                     $dictionaries->map(function ($dictionary) {
-                        return ['type' => 'dictionary', 'id' => $dictionary->id, 'title' => $dictionary->title_lv, 'order' => $dictionary->order];
+                        return ['type' => 'dictionary', 'id' => $dictionary->id, 'title' => $dictionary->title_lv, 'order' => $dictionary->order, 'content_preview' => substr(strip_tags(DB::table('translations')->where('dictionary_id', $dictionary->id)->value('phrase_lv')), 0, 55) . (strlen(strip_tags('')) > 55 ? '...' : '')];
                     })
                 ))->sortBy('order');
 
