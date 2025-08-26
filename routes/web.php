@@ -28,6 +28,7 @@ foreach ($locales as $locale) {
 
         Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name($locale . '.register');
         Route::post('/register', [RegisterController::class, 'register'])->name($locale . '.register.post');
+        Route::get('/register/{token}', [RegisterController::class, 'showInvitedRegistrationForm'])->name($locale . '.register.token');
 
         // password reset 
         Route::get('password/reset', [ForgotPasswordController::class, 'showLinkRequestForm'])->name($locale . '.password.request');
@@ -82,6 +83,8 @@ Route::middleware(['AdminCheck'])->group(function () {
     Route::post('/admin/users', [AdminController::class, 'storeUser'])->name('admin.users.store');
     Route::put('/admin/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
     Route::delete('/admin/users/{user}', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
+    Route::get('/import-users', [AdminController::class, 'importUsers'])->name('admin.import.users');
+    Route::post('/import-users', [AdminController::class, 'processImport'])->name('admin.import.users.post');
 
     Route::get('/topics', [AdminController::class, 'topics'])->name('topics');
     Route::get('topic/{id}', [AdminController::class, 'topic'])->name('topic.view');

@@ -132,6 +132,12 @@
                                 <p>Lietotāji</p>
                             </a>
                         </li>
+                        <li class="nav-item {{ Route::currentRouteName() == 'admin.import.users' ? 'active' : '' }}">
+                            <a href="{{ route('admin.import.users') }}">
+                                <i class="fas fa-users-cog"></i>
+                                <p>Lietotāju Imports</p>
+                            </a>
+                        </li>
                         <li class="nav-item {{ Route::currentRouteName() == 'tests.users' ? 'active' : '' }}">
                             <a href="{{ route('tests.users') }}">
                                 <i class="fas fa-pen-square"></i>

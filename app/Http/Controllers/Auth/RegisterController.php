@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\WelcomeEmail;
 use PhpParser\Node\Stmt\Switch_;
+use App\Models\PendingUser;
 
 class RegisterController extends Controller
 {
@@ -97,7 +98,15 @@ class RegisterController extends Controller
 
     protected function registered(Request $request, $user)
     {
-        // dd('registered');
+        if ($request->filled('token')) {
+            $pending = PendingUser::where('token', $request->input('token'))
+                ->where('email', $user->email)
+                ->first();
+
+            if ($pending) {
+                $pending->delete();
+            }
+        }
 
         Session::put('lang', $user->language);
         $credentials = $user->only('email', 'password');
@@ -113,5 +122,26 @@ class RegisterController extends Controller
         }
         $lang = $user->language ?? 'lv';
         return redirect('/' . $lang);
+    }
+
+    public function showInvitedRegistrationForm($token)
+    {
+        $pending = PendingUser::where('token', $token)
+            ->where('expires_at', '>', now())
+            ->firstOrFail();
+
+        session(['lang' => $pending->language]);
+        $lang = $pending->language;
+
+        $translations = [
+            'lv' => 'Reģistrācija',
+            'en' => 'Registration',
+            'ru' => 'Регистрация',
+            'ukr' => 'Реєстрація',
+        ];
+        $title = $translations[$lang] ?? 'Registration';
+        $prefill = $pending;
+
+        return view('auth.register', compact('title', 'prefill'));
     }
 }

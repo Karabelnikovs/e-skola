@@ -14,6 +14,8 @@ use Stichoza\GoogleTranslate\GoogleTranslate;
 use App\Models\Contacts;
 use App\Models\Terms;
 use App\Models\Privacy;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\UsersImport;
 
 class AdminController extends Controller
 {
@@ -21,9 +23,16 @@ class AdminController extends Controller
 
     public function uploadImage(Request $request)
     {
-        $request->validate([
-            'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
-        ]);
+        $request->validate(
+            [
+                'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+            ],
+            [
+                'file.required' => 'Lūdzim izvēlieties attēlu.',
+                'file.image' => 'Failam ir jābūt attēla formātā (jpeg, png, jpg, gif).',
+                'file.max' => 'Attēla izmērs nedrīkst pārsniegt 2MB.',
+            ]
+        );
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
@@ -276,17 +285,39 @@ class AdminController extends Controller
         if (!session('is_admin')) {
             return redirect()->route('courses.index');
         }
-        $request->validate([
-            'course_id' => 'required|exists:courses,id',
-            'title_lv' => 'required|string|max:255',
-            'title_en' => 'required|string|max:255',
-            'title_ru' => 'required|string|max:255',
-            'title_ua' => 'required|string|max:255',
-            'content_lv' => 'nullable|string',
-            'content_en' => 'nullable|string',
-            'content_ru' => 'nullable|string',
-            'content_ua' => 'nullable|string',
-        ]);
+        $request->validate(
+            [
+                'course_id' => 'required|exists:courses,id',
+                'title_lv' => 'required|string|max:255',
+                'title_en' => 'required|string|max:255',
+                'title_ru' => 'required|string|max:255',
+                'title_ua' => 'required|string|max:255',
+                'content_lv' => 'nullable|string',
+                'content_en' => 'nullable|string',
+                'content_ru' => 'nullable|string',
+                'content_ua' => 'nullable|string',
+            ],
+            [
+                'course_id.required' => 'Lūdzu izvēlieties kursu.',
+                'course_id.exists' => 'Izvēlētais kurss neeksistē.',
+
+                'title_lv.required' => 'Lūdzu ievadiet tēmas nosaukumu latviešu valodā.',
+                'title_lv.string' => 'Tēmas nosaukumam latviešu valodā jābūt tekstam.',
+                'title_lv.max' => 'Tēmas nosaukums latviešu valodā nedrīkst pārsniegt :max rakstzīmes.',
+
+                'title_en.required' => 'Lūdzu ievadiet tēmas nosaukumu angļu valodā.',
+                'title_en.string' => 'Tēmas nosaukumam angļu valodā jābūt tekstam.',
+                'title_en.max' => 'Tēmas nosaukums angļu valodā nedrīkst pārsniegt :max rakstzīmes.',
+
+                'title_ru.required' => 'Lūdzu ievadiet tēmas nosaukumu krievu valodā.',
+                'title_ru.string' => 'Tēmas nosaukumam krievu valodā jābūt tekstam.',
+                'title_ru.max' => 'Tēmas nosaukums krievu valodā nedrīkst pārsniegt :max rakstzīmes.',
+
+                'title_ua.required' => 'Lūdzu ievadiet tēmas nosaukumu ukraiņu valodā.',
+                'title_ua.string' => 'Tēmas nosaukumam ukraiņu valodā jābūt tekstam.',
+                'title_ua.max' => 'Tēmas nosaukums ukraiņu valodā nedrīkst pārsniegt :max rakstzīmes.',
+            ]
+        );
 
         $maxOrderTopic = DB::table('topics')->where('course_id', $request->input('course_id'))->max('order');
         $maxOrderTest = DB::table('tests')->where('course_id', $request->input('course_id'))->max('order');
@@ -329,17 +360,39 @@ class AdminController extends Controller
     public function updateTopic(Request $request, $id)
     {
         // dd($request->all());
-        $data = $request->validate([
-            'course_id' => 'required|exists:courses,id',
-            'title_lv' => 'required|string|max:255',
-            'title_en' => 'required|string|max:255',
-            'title_ru' => 'required|string|max:255',
-            'title_ua' => 'required|string|max:255',
-            'content_lv' => 'nullable|string',
-            'content_en' => 'nullable|string',
-            'content_ru' => 'nullable|string',
-            'content_ua' => 'nullable|string',
-        ]);
+        $data = $request->validate(
+            [
+                'course_id' => 'required|exists:courses,id',
+                'title_lv' => 'required|string|max:255',
+                'title_en' => 'required|string|max:255',
+                'title_ru' => 'required|string|max:255',
+                'title_ua' => 'required|string|max:255',
+                'content_lv' => 'nullable|string',
+                'content_en' => 'nullable|string',
+                'content_ru' => 'nullable|string',
+                'content_ua' => 'nullable|string',
+            ],
+            [
+                'course_id.required' => 'Lūdzu izvēlieties kursu.',
+                'course_id.exists' => 'Izvēlētais kurss neeksistē.',
+
+                'title_lv.required' => 'Lūdzu ievadiet tēmas nosaukumu latviešu valodā.',
+                'title_lv.string' => 'Tēmas nosaukumam latviešu valodā jābūt tekstam.',
+                'title_lv.max' => 'Tēmas nosaukums latviešu valodā nedrīkst pārsniegt :max rakstzīmes.',
+
+                'title_en.required' => 'Lūdzu ievadiet tēmas nosaukumu angļu valodā.',
+                'title_en.string' => 'Tēmas nosaukumam angļu valodā jābūt tekstam.',
+                'title_en.max' => 'Tēmas nosaukums angļu valodā nedrīkst pārsniegt :max rakstzīmes.',
+
+                'title_ru.required' => 'Lūdzu ievadiet tēmas nosaukumu krievu valodā.',
+                'title_ru.string' => 'Tēmas nosaukumam krievu valodā jābūt tekstam.',
+                'title_ru.max' => 'Tēmas nosaukums krievu valodā nedrīkst pārsniegt :max rakstzīmes.',
+
+                'title_ua.required' => 'Lūdzu ievadiet tēmas nosaukumu ukraiņu valodā.',
+                'title_ua.string' => 'Tēmas nosaukumam ukraiņu valodā jābūt tekstam.',
+                'title_ua.max' => 'Tēmas nosaukums ukraiņu valodā nedrīkst pārsniegt :max rakstzīmes.',
+            ]
+        );
 
 
         $topic = Topic::findOrFail($id);
@@ -368,26 +421,58 @@ class AdminController extends Controller
 
     public function storeTest(Request $request)
     {
-        $validated = $request->validate([
-            'title_en' => 'required|string|max:255',
-            'title_lv' => 'required|string|max:255',
-            'title_ru' => 'required|string|max:255',
-            'title_ua' => 'required|string|max:255',
-            'passing_score' => 'required|integer|min:0',
-            'course_id' => 'required|exists:courses,id',
-            'is_final_test' => 'nullable',
-            'questions' => 'required|array',
-            'questions.*.question_lv' => 'required|string',
-            'questions.*.question_en' => 'required|string',
-            'questions.*.question_ru' => 'required|string',
-            'questions.*.question_uk' => 'required|string',
-            'questions.*.options' => 'required|array|min:2|max:4',
-            'questions.*.options.*.lv' => 'required|string',
-            'questions.*.options.*.en' => 'required|string',
-            'questions.*.options.*.ru' => 'required|string',
-            'questions.*.options.*.uk' => 'required|string',
-            'questions.*.correct_answer' => 'required|integer|min:0|max:3',
-        ]);
+        $validated = $request->validate(
+            [
+                'title_en' => 'required|string|max:255',
+                'title_lv' => 'required|string|max:255',
+                'title_ru' => 'required|string|max:255',
+                'title_ua' => 'required|string|max:255',
+                'passing_score' => 'required|integer|min:0',
+                'course_id' => 'required|exists:courses,id',
+                'is_final_test' => 'nullable',
+                'questions' => 'required|array',
+                'questions.*.question_lv' => 'required|string',
+                'questions.*.question_en' => 'required|string',
+                'questions.*.question_ru' => 'required|string',
+                'questions.*.question_uk' => 'required|string',
+                'questions.*.options' => 'required|array|min:2|max:4',
+                'questions.*.options.*.lv' => 'required|string',
+                'questions.*.options.*.en' => 'required|string',
+                'questions.*.options.*.ru' => 'required|string',
+                'questions.*.options.*.uk' => 'required|string',
+                'questions.*.correct_answer' => 'required|integer|min:0|max:3',
+            ],
+            [
+                'title_lv.required' => 'Lūdzu ievadiet testa nosaukumu latviešu valodā.',
+                'title_en.required' => 'Lūdzu ievadiet testa nosaukumu angļu valodā.',
+                'title_ru.required' => 'Lūdzu ievadiet testa nosaukumu krievu valodā.',
+                'title_ua.required' => 'Lūdzu ievadiet testa nosaukumu ukraiņu valodā.',
+
+                'passing_score.required' => 'Lūdzu norādiet minimālo nepieciešamo punktu skaitu.',
+                'passing_score.integer' => 'Minimālajam punktu skaitam jābūt veselam skaitlim.',
+                'passing_score.min' => 'Punktu skaits nevar būt negatīvs.',
+
+                'course_id.required' => 'Lūdzu izvēlieties kursu.',
+                'course_id.exists' => 'Izvēlētais kurss neeksistē.',
+
+                'questions.required' => 'Lūdzu pievienojiet vismaz vienu jautājumu.',
+                'questions.array' => 'Jautājumu dati ir nepareizā formātā.',
+
+                'questions.*.question_lv.required' => 'Lūdzu ievadiet jautājuma tekstu latviešu valodā.',
+                'questions.*.question_en.required' => 'Lūdzu ievadiet jautājuma tekstu angļu valodā.',
+                'questions.*.question_ru.required' => 'Lūdzu ievadiet jautājuma tekstu krievu valodā.',
+                'questions.*.question_uk.required' => 'Lūdzu ievadiet jautājuma tekstu ukraiņu valodā.',
+
+                'questions.*.options.required' => 'Katram jautājumam jābūt vismaz divām atbilžu opcijām.',
+                'questions.*.options.min' => 'Katram jautājumam jābūt vismaz divām atbilžu opcijām.',
+                'questions.*.options.max' => 'Katram jautājumam nedrīkst būt vairāk par četrām atbilžu opcijām.',
+
+                'questions.*.options.*.lv.required' => 'Lūdzu ievadiet atbildes opciju latviešu valodā.',
+                'questions.*.options.*.en.required' => 'Lūdzu ievadiet atbildes opciju angļu valodā.',
+                'questions.*.options.*.ru.required' => 'Lūdzu ievadiet atbildes opciju krievu valodā.',
+                'questions.*.options.*.uk.required' => 'Lūdzu ievadiet atbildes opciju ukraiņu valodā.',
+            ]
+        );
 
         $maxOrderTopic = DB::table('topics')->where('course_id', $request->input('course_id'))->max('order');
         $maxOrderTest = DB::table('tests')->where('course_id', $request->input('course_id'))->max('order');
@@ -454,26 +539,58 @@ class AdminController extends Controller
     public function updateTest(Request $request, $id)
     {
         // dd($request->all());
-        $validated = $request->validate([
-            'title_en' => 'required|string|max:255',
-            'title_lv' => 'required|string|max:255',
-            'title_ru' => 'required|string|max:255',
-            'title_ua' => 'required|string|max:255',
-            'passing_score' => 'required|integer|min:0',
-            'course_id' => 'required|exists:courses,id',
-            'is_final_test' => 'nullable',
-            'questions' => 'required|array',
-            'questions.*.question_lv' => 'required|string',
-            'questions.*.question_en' => 'required|string',
-            'questions.*.question_ru' => 'required|string',
-            'questions.*.question_uk' => 'required|string',
-            'questions.*.options' => 'required|array|min:2|max:4',
-            'questions.*.options.*.lv' => 'required|string',
-            'questions.*.options.*.en' => 'required|string',
-            'questions.*.options.*.ru' => 'required|string',
-            'questions.*.options.*.uk' => 'required|string',
-            'questions.*.correct_answer' => 'required|integer|min:0|max:3',
-        ]);
+        $validated = $request->validate(
+            [
+                'title_en' => 'required|string|max:255',
+                'title_lv' => 'required|string|max:255',
+                'title_ru' => 'required|string|max:255',
+                'title_ua' => 'required|string|max:255',
+                'passing_score' => 'required|integer|min:0',
+                'course_id' => 'required|exists:courses,id',
+                'is_final_test' => 'nullable',
+                'questions' => 'required|array',
+                'questions.*.question_lv' => 'required|string',
+                'questions.*.question_en' => 'required|string',
+                'questions.*.question_ru' => 'required|string',
+                'questions.*.question_uk' => 'required|string',
+                'questions.*.options' => 'required|array|min:2|max:4',
+                'questions.*.options.*.lv' => 'required|string',
+                'questions.*.options.*.en' => 'required|string',
+                'questions.*.options.*.ru' => 'required|string',
+                'questions.*.options.*.uk' => 'required|string',
+                'questions.*.correct_answer' => 'required|integer|min:0|max:3',
+            ],
+            [
+                'title_lv.required' => 'Lūdzu ievadiet testa nosaukumu latviešu valodā.',
+                'title_en.required' => 'Lūdzu ievadiet testa nosaukumu angļu valodā.',
+                'title_ru.required' => 'Lūdzu ievadiet testa nosaukumu krievu valodā.',
+                'title_ua.required' => 'Lūdzu ievadiet testa nosaukumu ukraiņu valodā.',
+
+                'passing_score.required' => 'Lūdzu norādiet minimālo nepieciešamo punktu skaitu.',
+                'passing_score.integer' => 'Minimālajam punktu skaitam jābūt veselam skaitlim.',
+                'passing_score.min' => 'Punktu skaits nevar būt negatīvs.',
+
+                'course_id.required' => 'Lūdzu izvēlieties kursu.',
+                'course_id.exists' => 'Izvēlētais kurss neeksistē.',
+
+                'questions.required' => 'Lūdzu pievienojiet vismaz vienu jautājumu.',
+                'questions.array' => 'Jautājumu dati ir nepareizā formātā.',
+
+                'questions.*.question_lv.required' => 'Lūdzu ievadiet jautājuma tekstu latviešu valodā.',
+                'questions.*.question_en.required' => 'Lūdzu ievadiet jautājuma tekstu angļu valodā.',
+                'questions.*.question_ru.required' => 'Lūdzu ievadiet jautājuma tekstu krievu valodā.',
+                'questions.*.question_uk.required' => 'Lūdzu ievadiet jautājuma tekstu ukraiņu valodā.',
+
+                'questions.*.options.required' => 'Katram jautājumam jābūt vismaz divām atbilžu opcijām.',
+                'questions.*.options.min' => 'Katram jautājumam jābūt vismaz divām atbilžu opcijām.',
+                'questions.*.options.max' => 'Katram jautājumam nedrīkst būt vairāk par četrām atbilžu opcijām.',
+
+                'questions.*.options.*.lv.required' => 'Lūdzu ievadiet atbildes opciju latviešu valodā.',
+                'questions.*.options.*.en.required' => 'Lūdzu ievadiet atbildes opciju angļu valodā.',
+                'questions.*.options.*.ru.required' => 'Lūdzu ievadiet atbildes opciju krievu valodā.',
+                'questions.*.options.*.uk.required' => 'Lūdzu ievadiet atbildes opciju ukraiņu valodā.',
+            ]
+        );
 
         $test = Test::findOrFail($id);
         $type = $request->has('is_final_test') ? 'final' : 'test';
@@ -1088,5 +1205,30 @@ class AdminController extends Controller
 
         $title = 'Lietotāja progress';
         return view('admin.progress.progress', compact('progress', 'title', 'user', 'courses'));
+    }
+
+    public function importUsers()
+    {
+        if (!session('is_admin')) {
+            return redirect()->route('courses.index');
+        }
+        $courses = DB::table('courses')->get();
+        $title = 'Lietotāju imports';
+        return view('admin.import_users', compact('title', 'courses'));
+    }
+
+    public function processImport(Request $request)
+    {
+        if (!session('is_admin')) {
+            return redirect()->route('courses.index');
+        }
+
+        $request->validate([
+            'excel_file' => 'required|file|mimes:xlsx,xls|max:20480',
+        ]);
+
+        Excel::import(new UsersImport, $request->file('excel_file'));
+
+        return redirect()->route('admin.import.users')->with('success', 'Users imported successfully. Invitations have been sent!');
     }
 }

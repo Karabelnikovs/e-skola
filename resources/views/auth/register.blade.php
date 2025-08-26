@@ -152,12 +152,13 @@
 
                 <label class="block font-semibold">{{ $translations[$lang]['name'] }}</label>
                 <input type="text" placeholder="{{ $translations[$lang]['name'] }}..." id="name" name="name"
-                    value="{{ old('name') }}" required autofocus
+                    value="{{ old('name', isset($prefill) ? $prefill->name : '') }}" required autofocus
                     class="border w-full h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-indigo-500 focus:ring-1 rounded-md">
 
                 <label class="block mt-3 font-semibold">{{ $translations[$lang]['email'] }}</label>
                 <input type="email" placeholder="{{ $translations[$lang]['email'] }}..." id="email" name="email"
-                    value="{{ old('email') }}" required
+                    value="{{ old('email', isset($prefill) ? $prefill->email : '') }}"
+                    {{ isset($prefill) ? 'readonly' : '' }} required
                     class="border w-full h-5 px-3 py-5 mt-2 hover:outline-none focus:outline-none focus:ring-indigo-500 focus:ring-1 rounded-md">
 
                 <label class="block mt-3 font-semibold">{{ $translations[$lang]['password'] }}</label>
@@ -173,11 +174,18 @@
                 <label class="block mt-3 font-semibold">{{ $translations[$lang]['main_lang'] }}</label>
                 <select name="main_lang" id="main_lang" class="border w-full h-10 px-3 py-2 mt-2 rounded-md">
                     @foreach (config('locale.supported') as $locale)
-                        <option value="{{ $locale }}" @if ($locale == $lang) selected @endif>
+                        <option value="{{ $locale }}"
+                            {{ (isset($prefill) && $prefill->language == $locale) || $locale == $lang ? 'selected' : '' }}>
                             {{ $translations[$locale]['lang'] }}
                         </option>
                     @endforeach
                 </select>
+                @if (isset($prefill))
+                    <input type="hidden" name="main_lang" value="{{ $prefill->language }}">
+                @endif
+                @if (isset($prefill))
+                    <input type="hidden" name="token" value="{{ $prefill->token }}">
+                @endif
 
                 <div class="flex justify-between items-baseline">
                     <button type="submit"
