@@ -10,6 +10,7 @@ use App\Models\Topic;
 use App\Models\Test;
 use App\Models\Question;
 use Illuminate\Support\Facades\Http;
+use Log;
 use Stichoza\GoogleTranslate\GoogleTranslate;
 use App\Models\Contacts;
 use App\Models\Terms;
@@ -23,6 +24,7 @@ class AdminController extends Controller
 
     public function uploadImage(Request $request)
     {
+        Log::info('Upload image request received', ['request' => $request->all()]);
         $request->validate(
             [
                 'file' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
@@ -33,17 +35,20 @@ class AdminController extends Controller
                 'file.max' => 'Attēla izmērs nedrīkst pārsniegt 2MB.',
             ]
         );
+        Log::info('File validation passed', ['file' => $request->file('file')]);
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
 
-            $path = $file->store('uploads', 'public_uploads');
+            $path = $file->store('uploads', 'public');
 
             $url = asset('storage/uploads/' . basename($path));
 
+            Log::info('File uploaded successfully', ['url' => $url]);
             return response()->json(['location' => $url]);
         }
 
+        Log::warning('No file uploaded in the request');
         return response()->json(['error' => 'No file uploaded'], 400);
     }
 

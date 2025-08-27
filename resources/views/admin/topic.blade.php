@@ -50,20 +50,25 @@
                 </div>
             @endforeach
 
+            <input type="hidden" name="content_en" id="hidden_content_en">
+            <input type="hidden" name="content_lv" id="hidden_content_lv">
+            <input type="hidden" name="content_ru" id="hidden_content_ru">
+            <input type="hidden" name="content_ua" id="hidden_content_ua">
+
             <div class="mb-3">
                 <label class="form-label">Saturs (EN)</label>
-                <textarea name="content_en" id="content_en" class="editor">{{ old('content_en', $topic->content_en ?? '') }}</textarea>
+                <div id="content_en" data-editable data-name="content_en"
+                    style="border:1px solid #ccc; min-height:400px; padding:10px;">{!! old('content_en', $topic->content_en ?? '') !!}</div>
             </div>
 
             @foreach ($languages as $code => $lang)
                 <div class="mb-3">
                     <label class="form-label">
                         Saturs ({{ strtoupper($code) }}) - {{ $lang }}
-                        <button type="button" class="btn btn-sm btn-outline-secondary translate-btn btn-round mx-4"
-                            data-lang="{{ $code == 'ua' ? 'uk' : $code }}" data-type="content">Tulkot no
-                            EN</button>
                     </label>
-                    <textarea name="content_{{ $code }}" id="content_{{ $code == 'ua' ? 'uk' : $code }}" class="editor">{{ old("content_$code", $topic?->{"content_$code"} ?? '') }}</textarea>
+                    <div id="content_{{ $code == 'ua' ? 'uk' : $code }}" data-editable
+                        data-name="content_{{ $code }}"
+                        style="border:1px solid #ccc; min-height:400px; padding:10px;">{!! old("content_$code", $topic?->{"content_$code"} ?? '') !!}</div>
                 </div>
             @endforeach
 
@@ -71,46 +76,60 @@
         </form>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/tinymce@5.10.9/tinymce.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jodit/build/jodit.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/jodit/build/jodit.min.js"></script>
     <script>
-        tinymce.init({
-            selector: 'textarea.editor',
-            plugins: 'preview importcss searchreplace autolink autosave save directionality code visualblocks visualchars fullscreen image link media codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons accordion',
-            toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | image',
-            images_upload_handler: function(blobInfo, success, failure) {
-                const formData = new FormData();
-                formData.append('file', blobInfo.blob(), blobInfo.filename());
-
-                fetch('{{ route('upload.image') }}', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                        },
-                        body: formData
-                    })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Upload failed');
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.location) {
-                            success(data.location);
-                        } else {
-                            failure(data.error || 'Upload failed');
-                        }
-                    })
-                    .catch(error => failure(error.message));
+        const joditConfig = {
+            uploader: {
+                url: '{{ route('upload.image') }}',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                filesVariableName: (i) => 'file',
+                withCredentials: false,
+                pathVariableName: 'path',
+                format: 'json',
+                method: 'POST',
+                isSuccess: function(resp) {
+                    return !!resp.location;
+                },
+                process: function(resp) {
+                    return {
+                        files: [resp.location],
+                        error: '',
+                        msg: '',
+                        baseurl: ''
+                    };
+                },
+                error: function(e) {
+                    console.error('Upload error:', e);
+                }
             },
             height: 400
+        };
+
+        window.editorEn = Jodit.make('#content_en', joditConfig);
+        window.editorLv = Jodit.make('#content_lv', joditConfig);
+        window.editorRu = Jodit.make('#content_ru', joditConfig);
+        window.editorUk = Jodit.make('#content_uk', joditConfig);
+
+        document.getElementById('topicForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            document.getElementById('hidden_content_en').value = editorEn.value;
+            document.getElementById('hidden_content_lv').value = editorLv.value;
+            document.getElementById('hidden_content_ru').value = editorRu.value;
+            document.getElementById('hidden_content_ua').value = editorUk.value;
+
+            this.submit();
         });
     </script>
-
     <script>
         document.getElementById('topicForm').addEventListener('submit', function(e) {
             const title_lv = document.getElementById('title_lv').value.trim();
             const title_en = document.getElementById('title_en').value.trim();
             const title_ru = document.getElementById('title_ru').value.trim();
-            const title_ua = document.getElementById('title_ua').value.trim();
+            const title_ua = document.getElementById('title_uk').value.trim();
             if (!title_lv) {
                 e.preventDefault();
                 Swal.fire('Kļūda', 'Lūdzu ievadiet tēmas nosaukumu(LV)!', 'warning');
@@ -129,7 +148,6 @@
             }
         });
     </script>
-
     <script>
         async function translateField(fromText, toLang) {
             const res = await fetch('{{ route('translate') }}', {
@@ -152,19 +170,14 @@
             btn.addEventListener('click', async function() {
                 const lang = this.dataset.lang;
                 const type = this.dataset.type;
-                const sourceId = type === 'title' ? 'title_en' : 'content_en';
-                const targetId = type === 'title' ? `title_${lang}` : `content_${lang}`;
+                const sourceId = 'title_en';
+                const targetId = `title_${lang}`;
 
-                const sourceValue = type === 'title' ?
-                    document.getElementById(sourceId).value :
-                    tinymce.get(sourceId).getContent();
+                const sourceValue = document.getElementById(sourceId).value.trim();
 
                 const translated = await translateField(sourceValue, lang);
-                if (type === 'title') {
-                    document.getElementById(targetId).value = translated;
-                } else {
-                    tinymce.get(targetId).setContent(translated);
-                }
+
+                document.getElementById(targetId).value = translated;
             });
         });
     </script>
