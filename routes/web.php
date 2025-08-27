@@ -143,6 +143,8 @@ Route::middleware(['AdminCheck'])->group(function () {
 
     Route::get('users-progress', [AdminController::class, 'usersProgress'])->name('users-progress');
     Route::get('progress/{id}', [AdminController::class, 'progress'])->name('user.progress');
+    Route::post('/test/{test}/toggle-final', [AdminController::class, 'toggleFinal'])->name('test.toggleFinal');
+
 });
 
 Route::get('/error', function () {

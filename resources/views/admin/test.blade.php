@@ -134,7 +134,7 @@
                 <div class=" checkbox-wrapper-2">
                     <label for="is_final_test">Vai šis ir gala tests?</label>
                     <input type="checkbox" name="is_final_test" id="is_final_test" class="mx-5 sc-gJwTLC ikxBAC"
-                        {{ isset($test) && $test->type === 'final test' ? 'checked' : '' }}>
+                        {{ isset($test) && $test->type === 'final' ? 'checked' : '' }}>
                 </div>
 
 
@@ -487,5 +487,64 @@
             const data = await res.json();
             return data.translated;
         }
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (isset($test))
+                const finalTestCheckbox = document.getElementById('is_final_test');
+
+                finalTestCheckbox.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    const url = "{{ route('test.toggleFinal', $test->id) }}";
+
+                    fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                is_final_test: isChecked
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Saglabāts!',
+                                    text: data.message,
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true
+                                });
+                            } else {
+                                this.checked = !isChecked;
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Kļūda!',
+                                    text: data.message || 'An error occurred while saving.'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            this.checked = !isChecked;
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Kļūda!',
+                                text: 'Kaut kas nogāja greizi... Lūdzu, pamēģiniet vēlreiz.'
+                            });
+                        });
+                });
+            @endif
+        });
     </script>
 @endsection

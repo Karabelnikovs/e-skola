@@ -526,6 +526,33 @@ class AdminController extends Controller
 
         return redirect()->route('module', $validated['course_id'])->with('success', 'Test created successfully.');
     }
+    public function toggleFinal(Request $request, Test $test)
+    {
+        Log::info("Toggling final test status for test ID {$test->id}", ['request' => $request->all()]);
+        try {
+            $request->validate([
+                'is_final_test' => 'required|boolean',
+            ]);
+
+            $type = $request->input('is_final_test') ? 'final' : 'test';
+
+            $test->type = $type;
+            $test->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Testa tips veiksmīgi atjaunināts.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("Failed to toggle final test status for test ID {$test->id}: " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Neizdevās atjaunināt testa tipu.'
+            ], 500);
+        }
+    }
 
 
     public function editTest($id, $course_id)
@@ -549,7 +576,6 @@ class AdminController extends Controller
 
     public function updateTest(Request $request, $id)
     {
-        // dd($request->all());
         $validated = $request->validate(
             [
                 'title_en' => 'required|string|max:255',
