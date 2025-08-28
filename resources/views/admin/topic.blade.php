@@ -98,7 +98,8 @@
                         files: [resp.location],
                         error: '',
                         msg: '',
-                        baseurl: ''
+                        baseurl: '',
+                        isImages: [true]
                     };
                 },
                 error: function(e) {
