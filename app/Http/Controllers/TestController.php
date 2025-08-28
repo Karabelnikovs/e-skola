@@ -189,7 +189,7 @@ class TestController extends Controller
                         $userNameWidth = $pdf->GetStringWidth($userName);
                         $pdf->text(($width - $userNameWidth) / 2, $height / 2 - 16, $userName);
 
-                        $courseTitle = iconv('UTF-8', 'windows-1257', $course->title_en);
+                        $courseTitle = iconv('UTF-8', 'windows-1257', $course->title_lv);
                         $courseTitleWidth = $pdf->GetStringWidth($courseTitle);
                         $pdf->text(($width - $courseTitleWidth) / 2, ($height / 2) + 20, $courseTitle);
 
