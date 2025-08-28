@@ -1178,9 +1178,86 @@ class AdminController extends Controller
     public function usersProgress()
     {
         $courses = DB::table('courses')->get();
-        $users = DB::table('users')->orderBy('created_at', 'desc')->get();
+
+        $items = DB::table('user_progress')
+            ->join('users', 'user_progress.user_id', '=', 'users.id')
+            ->join('courses', 'user_progress.course_id', '=', 'courses.id')
+            ->leftJoin('certificates', function ($join) {
+                $join->on('user_progress.user_id', '=', 'certificates.user_id')
+                    ->on('user_progress.course_id', '=', 'certificates.course_id');
+            })
+            ->select(
+                'users.id as user_id',
+                'users.name',
+                'users.email',
+                'courses.id as course_id',
+                'courses.title_lv as course_title_lv',
+                'user_progress.current_order',
+                'user_progress.updated_at',
+                'user_progress.created_at',
+                DB::raw('MAX(certificates.created_at) as certificate_date'),
+            )
+            ->groupBy(
+                'users.id',
+                'courses.id',
+                'users.name',
+                'users.email',
+                'courses.title_lv',
+                'user_progress.current_order',
+                'user_progress.updated_at',
+                'user_progress.created_at',
+            )
+            ->orderBy('user_progress.updated_at', 'desc')
+            ->get();
+
+        if ($items->isEmpty()) {
+            $title = 'Lietotāju sertifikāti';
+            return view('admin.progress.users', compact('title', 'items', 'courses'));
+        }
+
+        $courseIds = $items->pluck('course_id')->unique();
+
+        $testsCounts = DB::table('tests')
+            ->whereIn('course_id', $courseIds)
+            ->select('course_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('course_id')
+            ->get()->keyBy('course_id');
+
+        $topicsCounts = DB::table('topics')
+            ->whereIn('course_id', $courseIds)
+            ->select('course_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('course_id')
+            ->get()->keyBy('course_id');
+
+        $dictionariesCounts = DB::table('dictionaries')
+            ->whereIn('course_id', $courseIds)
+            ->select('course_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('course_id')
+            ->get()->keyBy('course_id');
+
+        $items->transform(function ($progressItem) use ($testsCounts, $topicsCounts, $dictionariesCounts) {
+            $courseId = $progressItem->course_id;
+
+            $tests = $testsCounts->get($courseId)->count ?? 0;
+            $topics = $topicsCounts->get($courseId)->count ?? 0;
+            $dictionaries = $dictionariesCounts->get($courseId)->count ?? 0;
+
+            $totalItems = $tests + $topics + $dictionaries;
+            $completedItems = $progressItem->current_order;
+
+            $percentage = $totalItems > 0
+                ? min(($completedItems / $totalItems) * 100, 100)
+                : 0;
+
+            $progressItem->total_items = $totalItems;
+            $progressItem->percentage = round($percentage, 2);
+            $progressItem->completed_items = $completedItems;
+
+            return $progressItem;
+        });
+
         $title = 'Lietotāju sertifikāti';
-        return view('admin.progress.users', compact('title', 'users', 'courses'));
+        return view('admin.progress.users', compact('title', 'items', 'courses'));
     }
     public function progress($userID)
     {

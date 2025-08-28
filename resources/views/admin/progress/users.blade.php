@@ -46,29 +46,48 @@
                                 <thead>
                                     <tr role="row">
                                         <th>Vārds</th>
-                                        <th>E-pasts</th>
-                                        <th>Loma</th>
+                                        <th>Progress</th>
+                                        <th>Sertifikāts</th>
                                         <th>Darbība</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
                                     <tr>
                                         <th>Vārds</th>
-                                        <th>E-pasts</th>
-                                        <th>Loma</th>
+                                        <th>Progress</th>
+                                        <th>Sertifikāts</th>
                                         <th>Darbība</th>
                                     </tr>
                                 </tfoot>
                                 <tbody>
-                                    @foreach ($users as $user)
+                                    {{-- @dd($items) --}}
+                                    @foreach ($items as $item)
                                         <tr role="row">
-                                            <td>{{ $user->name }}</td>
-                                            <td>{{ $user->email }}</td>
-                                            <td>{{ $user->role }}</td>
+                                            <td>{{ $item->name }}</td>
+                                            <td>
+                                                <div class="progress w-75" style="height: 25px;">
+                                                    <div class="progress-bar progress-bar-striped bg-success"
+                                                        role="progressbar" style="width: {{ $item->percentage }}%"
+                                                        aria-valuenow="{{ $item->percentage }}" aria-valuemin="0"
+                                                        aria-valuemax="100">
+                                                        {{ round($item->percentage) }}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if ($item->certificate_date)
+                                                    <a href="{{ route('certificate.download', [$item->user_id, $item->course_id]) }}"
+                                                        class="btn btn-label-info btn-round me-2">
+                                                        Lejupielādēt <i class="fas fa-file-download"></i>
+                                                    </a>
+                                                @else
+                                                    <p class="text-center">Nav</p>
+                                                @endif
+                                            </td>
                                             <td>
                                                 <div class="form-button-action">
-                                                    <a href="{{ route('user.progress', [$user->id]) }}"
-                                                        class="btn btn-label-info btn-round me-2">Lietotāja progress
+                                                    <a href="{{ route('user.progress', parameters: [$item->user_id]) }}"
+                                                        class="btn btn-label-info btn-round me-2">Progress visos moduļos
                                                         <i class="fas fa-angle-right"></i></a>
                                                 </div>
                                             </td>

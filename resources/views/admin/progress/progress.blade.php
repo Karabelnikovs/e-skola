@@ -47,7 +47,7 @@
 
                                         <div class="row text-center small">
                                             <div class="col-4">
-                                                <div class="text-muted">Moduļa sākts</div>
+                                                <div class="text-muted">Modulis sākts</div>
                                                 <div class="fw-bold">
                                                     {{ \Carbon\Carbon::parse($prog->created_at)->format('d.m.Y') }}
                                                 </div>
