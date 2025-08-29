@@ -170,34 +170,34 @@ class TestController extends Controller
                     try {
                         $issuedAt = now();
 
-                        $pdf = new Fpdi();
+                        $pdf = new \setasign\Fpdi\Tcpdf\Fpdi();
                         $templatePath = storage_path('app/public/templates/certificate_template.pdf');
-                        $pdf->setSourceFile(StreamReader::createByFile($templatePath));
+                        $pdf->setSourceFile(\setasign\Fpdi\PdfParser\StreamReader::createByFile($templatePath));
                         $templateId = $pdf->importPage(1);
 
                         $size = $pdf->getTemplateSize($templateId);
                         $width = $size['width'];
                         $height = $size['height'];
 
-                        $pdf->addPage('P', [$width, $height]);
-                        $pdf->useTemplate($templateId);
+                        $pdf->AddPage('P', [$width, $height]);
+                        $pdf->useImportedPage($templateId);
 
-                        $pdf->setFont('Arial', '', 20);
-                        $pdf->setTextColor(0, 0, 0);
+                        $pdf->SetFont('freesans', '', 20);
+                        $pdf->SetTextColor(0, 0, 0);
 
-                        $userName = iconv('UTF-8', 'windows-1257', $user->name);
+                        $userName = $user->name;
                         $userNameWidth = $pdf->GetStringWidth($userName);
-                        $pdf->text(($width - $userNameWidth) / 2, $height / 2 - 16, $userName);
+                        $pdf->Text(($width - $userNameWidth) / 2, $height / 2 - 23, $userName);
 
-                        $courseTitle = iconv('UTF-8', 'windows-1257', $course->title_lv);
+                        $courseTitle = $course->title_lv;
                         $courseTitleWidth = $pdf->GetStringWidth($courseTitle);
-                        $pdf->text(($width - $courseTitleWidth) / 2, ($height / 2) + 20, $courseTitle);
+                        $pdf->Text(($width - $courseTitleWidth) / 2, ($height / 2) + 10, $courseTitle);
 
                         $issueDate = $issuedAt->format('d/m/Y');
                         $issueDateWidth = $pdf->GetStringWidth($issueDate);
-                        $pdf->text(($width - $issueDateWidth) / 2, ($height / 2) + 40, $issueDate);
+                        $pdf->Text(($width - $issueDateWidth) / 2, ($height / 2) + 26, $issueDate);
 
-                        $pdf->output($fullPath, 'F');
+                        $pdf->Output($fullPath, 'F');
 
                         DB::table('certificates')->insert([
                             'user_id' => $user->id,

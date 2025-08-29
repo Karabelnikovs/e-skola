@@ -31,6 +31,12 @@
 
         $lang = Session::get('lang', 'lv');
     @endphp
+    <style>
+        td,
+        th {
+            border: 1px solid;
+        }
+    </style>
     <div class="card-body">
         <a href="{{ route($lang . '.courses.index') }}" class="btn btn-label-info btn-round me-2 mb-3 "><i
                 class="fas fa-arrow-circle-left "></i>
