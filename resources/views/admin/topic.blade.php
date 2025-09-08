@@ -22,9 +22,18 @@
             @if (isset($topic))
                 @method('POST')
             @endif
-            <a href='/module/{{ $module->id ?? $topic->course_id }}' class="btn btn-label-info btn-round me-2 mb-3"><i
-                    class="fas fa-arrow-circle-left "></i>
-                Atpakaļ</a>
+            <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
+
+                <a href='/module/{{ $module->id ?? $topic->course_id }}' class="btn btn-label-info btn-round me-2 mb-3"><i
+                        class="fas fa-arrow-circle-left "></i>
+                    Atpakaļ</a>
+                @if (isset($topic))
+                    <a href="{{ route('topic.delete', $topic->id) }}" onclick="return confirm('Vai esat pārliecināts?')"
+                        class="btn btn-label-info btn-round me-2 mb-3 ms-md-auto">
+                        Dzēst tēmu <i class="fa fa-trash-alt"></i></a>
+                @endif
+
+            </div>
             <input type="hidden" name="course_id" value="{{ $module->id ?? $topic->course_id }}">
 
             @php

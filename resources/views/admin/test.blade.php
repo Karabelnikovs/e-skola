@@ -15,87 +15,24 @@
                 });
             </script>
         @endif
-        <style>
-            .checkbox-wrapper-2 {
-                display: flex;
-                align-items: center;
-                justify-content: center;
 
-            }
-
-            .checkbox-wrapper-2 .ikxBAC {
-                appearance: none;
-                background-color: #dfe1e4;
-                border-radius: 72px;
-                border-style: none;
-                flex-shrink: 0;
-                height: 20px;
-                margin: 0;
-                position: relative;
-                width: 30px;
-
-            }
-
-            .checkbox-wrapper-2 .ikxBAC::before {
-                bottom: -6px;
-                content: "";
-                left: -6px;
-                position: absolute;
-                right: -6px;
-                top: -6px;
-            }
-
-            .checkbox-wrapper-2 .ikxBAC,
-            .checkbox-wrapper-2 .ikxBAC::after {
-                transition: all 100ms ease-out;
-            }
-
-            .checkbox-wrapper-2 .ikxBAC::after {
-                background-color: #fff;
-                border-radius: 50%;
-                content: "";
-                height: 14px;
-                left: 3px;
-                position: absolute;
-                top: 3px;
-                width: 14px;
-            }
-
-            .checkbox-wrapper-2 input[type=checkbox] {
-                cursor: default;
-            }
-
-            .checkbox-wrapper-2 .ikxBAC:hover {
-                background-color: #c9cbcd;
-                transition-duration: 0s;
-            }
-
-            .checkbox-wrapper-2 .ikxBAC:checked {
-                background-color: #6e79d6;
-            }
-
-            .checkbox-wrapper-2 .ikxBAC:checked::after {
-                background-color: #fff;
-                left: 13px;
-            }
-
-            .checkbox-wrapper-2 :focus:not(.focus-visible) {
-                outline: 0;
-            }
-
-            .checkbox-wrapper-2 .ikxBAC:checked:hover {
-                background-color: #535db3;
-            }
-        </style>
-        <form method="POST" action="{{ isset($test) ? route('test.update', $test->id) : route('test.store') }}"
-            id="testForm">
+        <form method="POST" action="{{ isset($test) ? route('test.update', $test->id) : route('test.store') }}" id="testForm"
+            enctype="multipart/form-data">
             @csrf
             {{-- @if (isset($test))
                     @method('PUT')
                 @endif --}}
-            <a href='/module/{{ $module->id ?? $topic->course_id }}' class="btn btn-label-info btn-round me-2 mb-3"><i
-                    class="fas fa-arrow-circle-left "></i>
-                Atpakaļ</a>
+            <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
+
+                <a href='/module/{{ $module->id ?? $topic->course_id }}' class="btn btn-label-info btn-round me-2 mb-3"><i
+                        class="fas fa-arrow-circle-left "></i>
+                    Atpakaļ</a>
+                @if (isset($test))
+                    <a href="{{ route('test.delete', $test->id) }}" onclick="return confirm('Vai esat pārliecināts?')"
+                        class="btn btn-label-info btn-round me-2 mb-3 ms-md-auto">
+                        Dzēst testu <i class="fa fa-trash-alt"></i></a>
+                @endif
+            </div>
             <div id="test-details">
                 <div class="form-group">
                     <label for="title">Testa nosaukums (EN)</label>
@@ -184,6 +121,30 @@
                                     <input type="text" name="questions[{{ $index }}][question_uk]"
                                         class="form-control" value="{{ $question->question_uk ?? '' }}" required>
                                 </div>
+
+                                <div class="form-group">
+                                    <label>Attēls</label>
+                                    <input type="file" name="questions[{{ $index }}][image]" accept="image/*"
+                                        class="form-control">
+                                    @if (isset($question->image) && $question->image)
+                                        <img src="{{ asset('storage/' . $question->image) }}" alt="Question Image"
+                                            style="max-width: 200px; margin-top: 10px;">
+                                        <input type="hidden" name="questions[{{ $index }}][existing_image]"
+                                            value="{{ $question->image }}">
+                                    @endif
+                                </div>
+                                <div class="form-group">
+                                    <label>Audio</label>
+                                    <input type="file" name="questions[{{ $index }}][audio]" accept="audio/*"
+                                        class="form-control">
+                                    @if (isset($question->audio) && $question->audio)
+                                        <audio controls src="{{ asset('storage/' . $question->audio) }}"
+                                            style="margin-top: 10px;"></audio>
+                                        <input type="hidden" name="questions[{{ $index }}][existing_audio]"
+                                            value="{{ $question->audio }}">
+                                    @endif
+                                </div>
+
                                 <div class="options mt-2">
                                     @foreach (json_decode($question->options_en) as $optIndex => $optionEn)
                                         <div class="option-block mb-2" data-option-index="{{ $optIndex }}">
@@ -284,6 +245,16 @@
                     <button type="button" class="btn btn-sm btn-outline-secondary translate-btn mx-4 my-2 btn-round"  data-lang="uk" data-type="question">Tulkot no EN</button>
                     <input type="text" name="questions[[questionIndex]][question_uk]" class="form-control" required>
                 </div>
+
+<div class="form-group">
+    <label>Attēls</label>
+    <input type="file" name="questions[[questionIndex]][image]" accept="image/*" class="form-control">
+</div>
+<div class="form-group">
+    <label>Audio</label>
+    <input type="file" name="questions[[questionIndex]][audio]" accept="audio/*" class="form-control">
+</div>
+
                 <div class="options mt-2"></div>
                 <div class="separator-dashed"></div>
                 <button type="button" class="add-option btn btn-secondary mt-2 btn-round" >Jauna atbilde</button>

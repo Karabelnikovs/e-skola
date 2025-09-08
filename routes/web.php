@@ -97,7 +97,12 @@ Route::middleware(['AdminCheck'])->group(function () {
     Route::get('/module/create', [AdminController::class, 'create'])->name('module.create');
     Route::post('/module/store', [AdminController::class, 'store'])->name('module.store');
     Route::get('/module/{id}', [AdminController::class, 'module'])->name('module');
+
     Route::get('module/delete/{id}', [AdminController::class, 'deleteModule'])->name('module.delete');
+    Route::get('test/delete/{id}', [AdminController::class, 'deleteTest'])->name('test.delete');
+    Route::get('dictionary/delete/{id}', [AdminController::class, 'deleteDictionary'])->name('dictionary.delete');
+    Route::get('topic/delete/{id}', [AdminController::class, 'deleteTopic'])->name('topic.delete');
+
 
     Route::get('/module/edit/{id}', [AdminController::class, 'edit'])->name('module.edit');
     Route::post('/module/update/{id}', [AdminController::class, 'update'])->name('module.update');
@@ -144,6 +149,7 @@ Route::middleware(['AdminCheck'])->group(function () {
     Route::get('users-progress', [AdminController::class, 'usersProgress'])->name('users-progress');
     Route::get('progress/{id}', [AdminController::class, 'progress'])->name('user.progress');
     Route::post('/test/{test}/toggle-final', [AdminController::class, 'toggleFinal'])->name('test.toggleFinal');
+    Route::post('/module/{module}/toggle-public', [AdminController::class, 'togglePublic'])->name('module.togglePublic');
 
 });
 

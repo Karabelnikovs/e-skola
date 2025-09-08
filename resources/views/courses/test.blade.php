@@ -79,6 +79,16 @@
                                     {{ $question->{'question_' . $lang} }}
                                 </h5>
                             @endif
+                            @if ($question->image)
+                                <img src="{{ asset('storage/' . $question->image) }}" alt="Question Image"
+                                    class="img-fluid mb-3" style="max-width: 100%; max-height: 300px;">
+                            @endif
+                            @if ($question->audio)
+                                <audio controls class="mb-3 d-block">
+                                    <source src="{{ asset('storage/' . $question->audio) }}" type="audio/mpeg">
+                                    Your browser does not support the audio element.
+                                </audio>
+                            @endif
                             <div class="list-group">
                                 @php
                                     $options =

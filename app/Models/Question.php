@@ -18,5 +18,7 @@ class Question extends Model
         'test_id',
         'correct_answer',
         'order',
+        'image',
+        'audio',
     ];
 }

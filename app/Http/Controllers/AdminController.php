@@ -17,6 +17,7 @@ use App\Models\Terms;
 use App\Models\Privacy;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\UsersImport;
+use App\Models\Course;
 
 class AdminController extends Controller
 {
@@ -152,6 +153,36 @@ class AdminController extends Controller
     {
         DB::table('courses')->where('id', $id)->delete();
         return redirect()->route('module.all')->with('success', 'Modulis veiksmīgi izdzēsts!');
+    }
+    public function deleteTest($id)
+    {
+        $module_id = DB::table('tests')->where('id', $id)->value('course_id');
+
+        $questions = DB::table('questions')->where('test_id', $id)->get();
+        foreach ($questions as $q) {
+            if ($q->image) {
+                Storage::disk('public')->delete($q->image);
+            }
+            if ($q->audio) {
+                Storage::disk('public')->delete($q->audio);
+            }
+        }
+
+        DB::table('questions')->where('test_id', $id)->delete();
+        DB::table('tests')->where('id', $id)->delete();
+        return redirect()->route('module', $module_id)->with('success', 'Tests veiksmīgi izdzēsts!');
+    }
+    public function deleteDictionary($id)
+    {
+        $module_id = DB::table('dictionaries')->where('id', $id)->value('course_id');
+        DB::table('dictionaries')->where('id', $id)->delete();
+        return redirect()->route('module', $module_id)->with('success', 'Vārdnīca veiksmīgi izdzēsta!');
+    }
+    public function deleteTopic($id)
+    {
+        $module_id = DB::table('topics')->where('id', $id)->value('course_id');
+        DB::table('topics')->where('id', $id)->delete();
+        return redirect()->route('module', $module_id)->with('success', 'Tēma veiksmīgi izdzēsta!');
     }
 
     public function update(Request $request)
@@ -452,6 +483,8 @@ class AdminController extends Controller
                 'questions.*.options.*.ru' => 'required|string',
                 'questions.*.options.*.uk' => 'required|string',
                 'questions.*.correct_answer' => 'required|integer|min:0|max:3',
+                'questions.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+                'questions.*.audio' => 'nullable|file|mimes:mp3,wav,m4a',
             ],
             [
                 'title_lv.required' => 'Lūdzu ievadiet testa nosaukumu latviešu valodā.',
@@ -482,6 +515,9 @@ class AdminController extends Controller
                 'questions.*.options.*.en.required' => 'Lūdzu ievadiet atbildes opciju angļu valodā.',
                 'questions.*.options.*.ru.required' => 'Lūdzu ievadiet atbildes opciju krievu valodā.',
                 'questions.*.options.*.uk.required' => 'Lūdzu ievadiet atbildes opciju ukraiņu valodā.',
+
+                'questions.*.image.image' => 'Jautājuma attēlam jābūt derīgam attēla formātam (jpeg, png, jpg, gif).',
+                'questions.*.audio.mimes' => 'Jautājuma audio failam jābūt mp3, wav vai m4a formātā.',
             ]
         );
 
@@ -509,6 +545,17 @@ class AdminController extends Controller
             $optionsEn = array_column($questionData['options'], 'en');
             $optionsRu = array_column($questionData['options'], 'ru');
             $optionsUa = array_column($questionData['options'], 'uk');
+
+            $imagePath = null;
+            if ($request->hasFile("questions.$index.image")) {
+                $imagePath = $request->file("questions.$index.image")->store('questions/images', 'public');
+            }
+
+            $audioPath = null;
+            if ($request->hasFile("questions.$index.audio")) {
+                $audioPath = $request->file("questions.$index.audio")->store('questions/audios', 'public');
+            }
+
             Question::create([
                 'test_id' => $test->id,
                 'question_lv' => $questionData['question_lv'],
@@ -521,6 +568,8 @@ class AdminController extends Controller
                 'options_ua' => json_encode($optionsUa),
                 'correct_answer' => $questionData['correct_answer'],
                 'order' => $index + 1,
+                'image' => $imagePath,
+                'audio' => $audioPath,
             ]);
         }
 
@@ -550,6 +599,31 @@ class AdminController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Neizdevās atjaunināt testa tipu.'
+            ], 500);
+        }
+    }
+
+    public function togglePublic(Request $request, Course $module)
+    {
+        try {
+            $request->validate([
+                'is_public' => 'required|boolean',
+            ]);
+
+            $module->public = $request->input('is_public');
+            $module->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Moduļa publiskums veiksmīgi atjaunināts.'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("Failed to toggle public status for module ID {$module->id}: " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Neizdevās atjaunināt moduļa publiskumu.'
             ], 500);
         }
     }
@@ -596,6 +670,10 @@ class AdminController extends Controller
                 'questions.*.options.*.ru' => 'required|string',
                 'questions.*.options.*.uk' => 'required|string',
                 'questions.*.correct_answer' => 'required|integer|min:0|max:3',
+                'questions.*.image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
+                'questions.*.audio' => 'nullable|file|mimes:mp3,wav,m4a',
+                'questions.*.existing_image' => 'nullable|string',
+                'questions.*.existing_audio' => 'nullable|string',
             ],
             [
                 'title_lv.required' => 'Lūdzu ievadiet testa nosaukumu latviešu valodā.',
@@ -626,6 +704,9 @@ class AdminController extends Controller
                 'questions.*.options.*.en.required' => 'Lūdzu ievadiet atbildes opciju angļu valodā.',
                 'questions.*.options.*.ru.required' => 'Lūdzu ievadiet atbildes opciju krievu valodā.',
                 'questions.*.options.*.uk.required' => 'Lūdzu ievadiet atbildes opciju ukraiņu valodā.',
+
+                'questions.*.image.image' => 'Jautājuma attēlam jābūt derīgam attēla formātam (jpeg, png, jpg, gif).',
+                'questions.*.audio.mimes' => 'Jautājuma audio failam jābūt mp3, wav vai m4a formātā.',
             ]
         );
 
@@ -641,6 +722,15 @@ class AdminController extends Controller
             'type' => $type,
         ]);
 
+        $oldQuestions = Question::where('test_id', $test->id)->get();
+        foreach ($oldQuestions as $q) {
+            if ($q->image) {
+                Storage::disk('public')->delete($q->image);
+            }
+            if ($q->audio) {
+                Storage::disk('public')->delete($q->audio);
+            }
+        }
         Question::where('test_id', $test->id)->delete();
 
         foreach ($validated['questions'] as $index => $questionData) {
@@ -648,6 +738,23 @@ class AdminController extends Controller
             $optionsEn = array_column($questionData['options'], 'en');
             $optionsRu = array_column($questionData['options'], 'ru');
             $optionsUa = array_column($questionData['options'], 'uk');
+
+            $imagePath = $questionData['existing_image'] ?? null;
+            if ($request->hasFile("questions.$index.image")) {
+                if ($imagePath) {
+                    Storage::disk('public')->delete($imagePath);
+                }
+                $imagePath = $request->file("questions.$index.image")->store('questions/images', 'public');
+            }
+
+            $audioPath = $questionData['existing_audio'] ?? null;
+            if ($request->hasFile("questions.$index.audio")) {
+                if ($audioPath) {
+                    Storage::disk('public')->delete($audioPath);
+                }
+                $audioPath = $request->file("questions.$index.audio")->store('questions/audios', 'public');
+            }
+
             Question::create([
                 'test_id' => $test->id,
                 'question_lv' => $questionData['question_lv'],
@@ -660,6 +767,8 @@ class AdminController extends Controller
                 'options_ua' => json_encode($optionsUa),
                 'correct_answer' => $questionData['correct_answer'],
                 'order' => $index + 1,
+                'image' => $imagePath,
+                'audio' => $audioPath,
             ]);
         }
 
@@ -750,13 +859,14 @@ class AdminController extends Controller
             'phrase_lv' => 'required|string|max:255',
             'phrase_ru' => 'required|string|max:255',
             'phrase_ua' => 'required|string|max:255',
+            'audio_lv' => 'nullable|file|mimes:m4a|max:10240',
         ]);
 
         $maxOrder = DB::table('translations')
             ->where('dictionary_id', $dictionaryId)
             ->max('order') ?? 0;
 
-        $translationId = DB::table('translations')->insertGetId([
+        $data = [
             'dictionary_id' => $dictionaryId,
             'phrase_en' => $request->phrase_en,
             'phrase_lv' => $request->phrase_lv,
@@ -765,9 +875,17 @@ class AdminController extends Controller
             'order' => $maxOrder + 1,
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
+        ];
 
-        return response()->json(['success' => true, 'id' => $translationId]);
+        if ($request->hasFile('audio_lv')) {
+            $path = $request->file('audio_lv')->store('audios', 'public');
+            $data['audio_lv'] = $path;
+        }
+
+        $translationId = DB::table('translations')->insertGetId($data);
+
+        // return response()->json(['success' => true, 'id' => $translationId]);
+        return response()->json(['success' => true, 'id' => $translationId, 'audio_lv' => $data['audio_lv'] ?? null]);
     }
 
     public function updateTranslation(Request $request, $id)
@@ -777,23 +895,40 @@ class AdminController extends Controller
             'phrase_lv' => 'required|string|max:255',
             'phrase_ru' => 'required|string|max:255',
             'phrase_ua' => 'required|string|max:255',
+            'audio_lv' => 'nullable|file|mimes:m4a|max:10240',
         ]);
+
+        $translation = DB::table('translations')->where('id', $id)->first();
+
+        $data = [
+            'phrase_en' => $request->phrase_en,
+            'phrase_lv' => $request->phrase_lv,
+            'phrase_ru' => $request->phrase_ru,
+            'phrase_ua' => $request->phrase_ua,
+            'updated_at' => now(),
+        ];
+
+        if ($request->hasFile('audio_lv')) {
+            if ($translation->audio_lv) {
+                Storage::disk('public')->delete($translation->audio_lv);
+            }
+            $path = $request->file('audio_lv')->store('audios', 'public');
+            $data['audio_lv'] = $path;
+        }
 
         DB::table('translations')
             ->where('id', $id)
-            ->update([
-                'phrase_en' => $request->phrase_en,
-                'phrase_lv' => $request->phrase_lv,
-                'phrase_ru' => $request->phrase_ru,
-                'phrase_ua' => $request->phrase_ua,
-                'updated_at' => now(),
-            ]);
-
-        return response()->json(['success' => true]);
+            ->update($data);
+        return response()->json(['success' => true, 'audio_lv' => $data['audio_lv'] ?? $translation->audio_lv]);
+        // return response()->json(['success' => true]);
     }
 
     public function deleteTranslation($id)
     {
+        $translation = DB::table('translations')->where('id', $id)->first();
+        if ($translation->audio_lv) {
+            Storage::disk('public')->delete($translation->audio_lv);
+        }
         DB::table('translations')->where('id', $id)->delete();
         return response()->json(['success' => true]);
     }

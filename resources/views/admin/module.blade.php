@@ -21,6 +21,12 @@
                 <a href="{{ route('module.edit', $module->id) }}" class="btn btn-label-info btn-round me-2">Rediģēt</a>
             </div>
         </div>
+
+        <div class=" checkbox-wrapper-2">
+            <label for="is_public">Vai modulis pieejams publiski?</label>
+            <input type="checkbox" name="is_public" id="is_public" class="mx-5 sc-gJwTLC ikxBAC"
+                {{ isset($module) && $module->public === 1 ? 'checked' : '' }}>
+        </div>
         <div class="row">
             <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
                 <h3>Tēmas un testi</h3>
@@ -108,6 +114,65 @@
                     }
                 });
             }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if (isset($module))
+                const isPublicCheckbox = document.getElementById('is_public');
+
+                isPublicCheckbox.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    const url = "{{ route('module.togglePublic', $module->id) }}";
+
+                    fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({
+                                is_public: isChecked
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Saglabāts!',
+                                    text: data.message,
+                                    toast: true,
+                                    position: 'top-end',
+                                    showConfirmButton: false,
+                                    timer: 3000,
+                                    timerProgressBar: true
+                                });
+                            } else {
+                                this.checked = !isChecked;
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Kļūda!',
+                                    text: data.message || 'An error occurred while saving.'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            this.checked = !isChecked;
+                            console.error('Error:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Kļūda!',
+                                text: 'Kaut kas nogāja greizi... Lūdzu, pamēģiniet vēlreiz.'
+                            });
+                        });
+                });
+            @endif
         });
     </script>
 @endsection

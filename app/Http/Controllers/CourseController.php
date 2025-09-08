@@ -19,8 +19,25 @@ class CourseController extends Controller
         if (!auth()->check()) {
             return redirect()->route($lang . '.login');
         }
-        $courses = Course::all();
-        $title = 'Courses';
+        if (session('is_admin')) {
+            $courses = Course::all();
+        } else {
+            $courses = Course::where('public', 1)->get();
+        }
+
+        switch ($lang) {
+            case 'ua':
+                $title = 'Модулі';
+                break;
+            case 'ru':
+                $title = 'Модули';
+                break;
+            case 'lv':
+                $title = 'Moduļi';
+                break;
+            default:
+                $title = 'Courses';
+        }
         return view('courses.index', compact('courses', 'title'));
     }
 
