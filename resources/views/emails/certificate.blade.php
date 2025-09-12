@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>{{ $welcome }}</title>
+    <title>{{ $congrats }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -68,9 +68,9 @@
                     fill="#36225f"></path>
             </svg>
         </div>
-        <h1>{{ $welcome }}, {{ $user->name }}!</h1>
+        <h1>{{ $congrats }}, {{ $user->name }}!</h1>
         <div class="content">
-            {!! $content !!}
+            {!! $body !!}
         </div>
         <div class="footer">
             &copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.

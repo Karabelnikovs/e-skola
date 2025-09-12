@@ -247,6 +247,18 @@
                                 <p>Privātuma politika</p>
                             </a>
                         </li>
+                        <li class="nav-item {{ Route::currentRouteName() == 'cookies' ? 'active' : '' }}">
+                            <a href="{{ route('cookies') }}">
+                                <i class="fas fa-cookie"></i>
+                                <p>Sīkdatņu politika</p>
+                            </a>
+                        </li>
+                        <li class="nav-item {{ Route::currentRouteName() == 'welcome_email' ? 'active' : '' }}">
+                            <a href="{{ route('welcome_email') }}">
+                                <i class="fas fa-handshake"></i>
+                                <p>Sveiciena epasts</p>
+                            </a>
+                        </li>
 
                         <li class="nav-item {{ Route::currentRouteName() == 'users-progress' ? 'active' : '' }}">
                             <a href="{{ route('users-progress') }}">

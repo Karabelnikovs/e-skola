@@ -60,6 +60,7 @@
             'privacy' => 'Privacy Policy',
             'terms' => 'Terms',
             'error_title' => 'Error',
+            'cookies' => 'Cookie Policy',
         ],
         'lv' => [
             'logout' => 'Iziet',
@@ -73,6 +74,7 @@
             'privacy' => 'Privātuma politika',
             'terms' => 'Noteikumi',
             'error_title' => 'Kļūda',
+            'cookies' => 'Sīkdatņu politika',
         ],
         'ru' => [
             'logout' => 'Выйти',
@@ -86,6 +88,7 @@
             'privacy' => 'Политика конфиденциальности',
             'terms' => 'Условия',
             'error_title' => 'Ошибка',
+            'cookies' => 'Политика использования файлов cookie',
         ],
         'ua' => [
             'logout' => 'Вийти',
@@ -99,6 +102,7 @@
             'privacy' => 'Політика конфіденційності',
             'terms' => 'Умови',
             'error_title' => 'Помилка',
+            'cookies' => 'Політика щодо файлів cookie',
         ],
     ];
     $lang = Session::get('lang', 'lv');
@@ -432,6 +436,10 @@
                             <li class="nav-item">
                                 <a class=" text-primary ms-1"
                                     href="{{ route($lang . '.privacy.show') }}">{{ $translations[$lang]['privacy'] }}</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class=" text-primary ms-1"
+                                    href="{{ route($lang . '.cookies.show') }}">{{ $translations[$lang]['cookies'] }}</a>
                             </li>
                         </ul>
                     </nav>

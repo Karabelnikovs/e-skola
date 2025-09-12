@@ -12,6 +12,8 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use setasign\Fpdi\Fpdi;
 use setasign\Fpdi\PdfParser\StreamReader;
 use TCPDF;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\CertificateEmail;
 
 class TestController extends Controller
 {
@@ -213,11 +215,21 @@ class TestController extends Controller
                             ->where('user_id', $user->id)
                             ->where('course_id', $courseId)
                             ->first();
+
+                        $certificateUrl = route('certificate.download', [
+                            'userID' => $user->id,
+                            'courseID' => $courseId
+                        ]);
+
+                        try {
+                            Mail::to($user->email)->send(new CertificateEmail($user, $course, $certificateUrl));
+                        } catch (\Exception $e) {
+                            Log::error('Failed to send certificate email: ' . $e->getMessage());
+                        }
                     } catch (\Exception $e) {
                         return response()->json(['error' => 'Failed to generate certificate: ' . $e->getMessage()], 500);
                     }
-                }
-                if ($certificate) {
+                } else {
                     $certificateUrl = route('certificate.download', [
                         'userID' => $user->id,
                         'courseID' => $courseId

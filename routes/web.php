@@ -45,6 +45,7 @@ foreach ($locales as $locale) {
             Route::get('contacts', [CourseController::class, 'showContacts'])->name($locale . '.contacts.show');
             Route::get('terms', [CourseController::class, 'showTerms'])->name($locale . '.terms.show');
             Route::get('privacy', [CourseController::class, 'showPrivacy'])->name($locale . '.privacy.show');
+            Route::get('cookies', [CourseController::class, 'showCookies'])->name($locale . '.cookies.show');
 
             Route::get('/', [CourseController::class, 'index'])->name($locale . '.courses.index');
 
@@ -142,6 +143,12 @@ Route::middleware(['AdminCheck'])->group(function () {
 
     Route::get('privacy', [AdminController::class, 'privacy'])->name('privacy');
     Route::post('privacy/store', [AdminController::class, 'storePrivacy'])->name('privacy.store');
+
+    Route::get('welcome_email', [AdminController::class, 'welcomeEmail'])->name('welcome_email');
+    Route::post('welcome_email/store', [AdminController::class, 'storeWelcomeEmail'])->name('welcome_email.store');
+
+    Route::get('cookies', [AdminController::class, 'cookies'])->name('cookies');
+    Route::post('cookies/store', [AdminController::class, 'storeCookies'])->name('cookies.store');
 
     Route::get('rules', [AdminController::class, 'useTerms'])->name('rules');
     Route::post('rules/store', [AdminController::class, 'storeTerms'])->name('rules.store');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\WelcomeEmail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -18,6 +19,7 @@ use App\Models\Privacy;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\UsersImport;
 use App\Models\Course;
+use App\Models\Cookies;
 
 class AdminController extends Controller
 {
@@ -1479,5 +1481,81 @@ class AdminController extends Controller
         Excel::import(new UsersImport, $request->file('excel_file'));
 
         return redirect()->route('admin.import.users')->with('success', 'Users imported successfully. Invitations have been sent!');
+    }
+
+
+    public function cookies()
+    {
+        if (!session('is_admin')) {
+            return redirect()->route('courses.index');
+        }
+        $courses = DB::table('courses')->get();
+
+        $title = 'Sīkdatņu politika';
+        $cookies = Cookies::first();
+
+        return view('admin.cookies', compact('title', 'courses', 'cookies'));
+    }
+
+    public function storeCookies(Request $request)
+    {
+        if (!session('is_admin')) {
+            return redirect()->route('courses.index');
+        }
+        $request->validate([
+            'content_lv' => 'nullable|string',
+            'content_en' => 'nullable|string',
+            'content_ru' => 'nullable|string',
+            'content_ua' => 'nullable|string',
+        ]);
+
+
+        Cookies::updateOrCreate(['id' => 1], [
+            'content_lv' => $request->input('content_lv'),
+            'content_en' => $request->input('content_en'),
+            'content_ru' => $request->input('content_ru'),
+            'content_ua' => $request->input('content_ua'),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('cookies')->with('success', 'Sīkdatņu politika saglabāta!');
+    }
+
+
+    public function welcomeEmail()
+    {
+        if (!session('is_admin')) {
+            return redirect()->route('courses.index');
+        }
+        $courses = DB::table('courses')->get();
+
+        $title = 'Sveiciena epasts';
+        $welcome_email = WelcomeEmail::first();
+
+        return view('admin.welcome_email', compact('title', 'courses', 'welcome_email'));
+    }
+
+    public function storeWelcomeEmail(Request $request)
+    {
+        if (!session('is_admin')) {
+            return redirect()->route('courses.index');
+        }
+        $request->validate([
+            'content_lv' => 'nullable|string',
+            'content_en' => 'nullable|string',
+            'content_ru' => 'nullable|string',
+            'content_ua' => 'nullable|string',
+        ]);
+
+
+        WelcomeEmail::updateOrCreate(['id' => 1], [
+            'content_lv' => $request->input('content_lv'),
+            'content_en' => $request->input('content_en'),
+            'content_ru' => $request->input('content_ru'),
+            'content_ua' => $request->input('content_ua'),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->route('welcome_email')->with('success', 'Sveiciena epasta saturs saglabāts!');
     }
 }

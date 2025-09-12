@@ -23,7 +23,7 @@
                 <div class="card-body p-4">
                     <div class="mb-5">
                         <h3 class=" mb-4 ">
-                            {!! $privacy->{'content_' . $lang} !!}
+                            {!! $cookies->{'content_' . $lang} !!}
                         </h3>
                         <div class="ps-4">
                         </div>

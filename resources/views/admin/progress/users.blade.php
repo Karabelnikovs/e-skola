@@ -63,8 +63,8 @@
                                     {{-- @dd($items) --}}
                                     @foreach ($items as $item)
                                         <tr role="row">
-                                            <td>{{ $item->name }}</td>
-                                            <td>
+                                            <td class="text-center">{{ $item->name }}</td>
+                                            <td class="text-center">
                                                 <div class="progress w-75" style="height: 25px;">
                                                     <div class="progress-bar progress-bar-striped bg-success"
                                                         role="progressbar" style="width: {{ $item->percentage }}%"
@@ -74,7 +74,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td class="text-center">
                                                 @if ($item->certificate_date)
                                                     <a href="{{ route('certificate.download', [$item->user_id, $item->course_id]) }}"
                                                         class="btn btn-label-info btn-round me-2">
@@ -85,7 +85,9 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <div class="form-button-action">
+                                                <div class="form-button-action"
+                                                    style="display: flex; flex-direction: column; text-align: center;">
+                                                    <p>{{ $item->course_title_lv }}</p>
                                                     <a href="{{ route('user.progress', parameters: [$item->user_id]) }}"
                                                         class="btn btn-label-info btn-round me-2">Progress visos moduļos
                                                         <i class="fas fa-angle-right"></i></a>

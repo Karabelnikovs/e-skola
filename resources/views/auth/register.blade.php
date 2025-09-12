@@ -21,6 +21,13 @@
                 'confirm_error' => 'The password confirmation does not match.',
                 'unique_error' => 'The email address has already been taken.',
                 'bad_email' => 'Email is invalid or cannot receive emails. Try a different one.',
+                'terms_conditions' =>
+                    'I agree to the <a href="#" class="text-purple-500 hover:underline">Terms & Conditions</a>',
+                'privacy_policy' =>
+                    'I agree to the <a href="#" class="text-purple-500 hover:underline">Privacy Policy</a>',
+                'cookies_policy' =>
+                    'I agree to the <a href="#" class="text-purple-500 hover:underline">Cookies Policy</a>',
+                'checkbox_error' => 'You must accept the terms, privacy policy, and cookies policy to register.',
             ],
             'lv' => [
                 'email' => 'E-pasts',
@@ -41,6 +48,14 @@
                 'confirm_error' => 'Paroles apstiprinājums nesakrīt.',
                 'unique_error' => 'E-pasta adrese jau ir aizņemta.',
                 'bad_email' => 'E-pasts ir nederīgs vai nevar saņemt e-pastus. Mēģiniet citu.',
+                'terms_conditions' =>
+                    'Es piekrītu <a href="#" class="text-purple-500 hover:underline">Lietošanas noteikumiem</a>',
+                'privacy_policy' =>
+                    'Es piekrītu <a href="#" class="text-purple-500 hover:underline">Privātuma politikai</a>',
+                'cookies_policy' =>
+                    'Es piekrītu <a href="#" class="text-purple-500 hover:underline">Sīkdatņu politikai</a>',
+                'checkbox_error' =>
+                    'Lai reģistrētos, jums ir jāpiekrīt lietošanas noteikumiem, privātuma politikai un sīkdatņu politikai.',
             ],
             'ru' => [
                 'email' => 'Электронная почта',
@@ -62,13 +77,21 @@
                 'unique_error' => 'Электронная почта уже занята.',
                 'bad_email' =>
                     'Электронная почта недействительна или не может получать электронные письма. Попробуйте другую.',
+                'terms_conditions' =>
+                    'Я согласен с <a href="#" class="text-purple-500 hover:underline">Условиями и положениями</a>',
+                'privacy_policy' =>
+                    'Я согласен с <a href="#" class="text-purple-500 hover:underline">Политикой конфиденциальности</a>',
+                'cookies_policy' =>
+                    'Я согласен с <a href="#" class="text-purple-500 hover:underline">Политикой использования файлов cookie</a>',
+                'checkbox_error' =>
+                    'Вы должны принять условия, политику конфиденциальности и политику в отношении файлов cookie для регистрации.',
             ],
             'ua' => [
                 'email' => 'Електронна пошта',
                 'password' => 'Пароль',
                 'remember_me' => 'Запам\'ятати мене',
                 'login' => 'Увійти',
-                'register' => 'Реರ\=Реєстрація',
+                'register' => 'Реєстрація',
                 'logout' => 'Вийти',
                 'name' => 'Ім\'я Прізвище',
                 'confirm_password' => 'Підтвердити пароль',
@@ -82,6 +105,14 @@
                 'confirm_error' => 'Підтвердження пароля не збігається.',
                 'unique_error' => 'Електронна пошта вже зайнята.',
                 'bad_email' => 'Електронна пошта недійсна або не може отримувати електронні листи. Спробуйте іншу.',
+                'terms_conditions' =>
+                    'Я погоджуюся з <a href="#" class="text-purple-500 hover:underline">Правилами та умовами</a>',
+                'privacy_policy' =>
+                    'Я погоджуюся з <a href="#" class="text-purple-500 hover:underline">Політикою конфіденційності</a>',
+                'cookies_policy' =>
+                    'Я погоджуюся з <a href="#" class="text-purple-500 hover:underline">Політикою щодо файлів cookie</a>',
+                'checkbox_error' =>
+                    'Ви повинні прийняти умови, політику конфіденційності та політику щодо файлів cookie, щоб зареєструватися.',
             ],
         ];
         $lang = Session::get('lang', 'en');
@@ -187,6 +218,23 @@
                     <input type="hidden" name="token" value="{{ $prefill->token }}">
                 @endif
 
+                {{-- Added Checkboxes Section --}}
+                <div class="mt-4 space-y-2">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="terms" name="terms" required class="h-4 w-4 rounded">
+                        <label for="terms" class="ml-2 text-sm">{!! $translations[$lang]['terms_conditions'] !!}</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="privacy" name="privacy" required class="h-4 w-4 rounded">
+                        <label for="privacy" class="ml-2 text-sm">{!! $translations[$lang]['privacy_policy'] !!}</label>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="checkbox" id="cookies" name="cookies" required class="h-4 w-4 rounded">
+                        <label for="cookies" class="ml-2 text-sm">{!! $translations[$lang]['cookies_policy'] !!}</label>
+                    </div>
+                </div>
+                {{-- End of Checkboxes Section --}}
+
                 <div class="flex justify-between items-baseline">
                     <button type="submit"
                         class="mt-4 bg-purple-500 text-white py-2 px-6 rounded-md hover:bg-purple-600">{{ $translations[$lang]['register'] }}</button>
@@ -224,6 +272,20 @@
             const password = document.getElementById('password').value;
             const passwordConfirmation = document.getElementById('password_confirmation').value;
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            // Checkbox validation
+            const terms = document.getElementById('terms').checked;
+            const privacy = document.getElementById('privacy').checked;
+            const cookies = document.getElementById('cookies').checked;
+
+            if (!terms || !privacy || !cookies) {
+                Swal.fire({
+                    icon: 'error',
+                    title: `{{ $translations[$lang]['error'] }}!`,
+                    html: `{{ $translations[$lang]['checkbox_error'] }}`
+                });
+                return false;
+            }
 
             if (name.length < 2) {
                 Swal.fire({

@@ -17,7 +17,7 @@
         @endif
 
 
-        <form method="POST" action="{{ route('rules.store') }}" id="termsForm">
+        <form method="POST" action="{{ route('cookies.store') }}" id="cookiesForm">
             @csrf
 
             <input type="hidden" name="content_en" id="hidden_content_en">
@@ -34,21 +34,21 @@
 
 
             <div class="mb-3">
-                <label class="form-label">Noteikumi (EN)</label>
-                <div id="content_en" style="border:1px solid #ccc; min-height:400px; padding:10px;">{!! old('content_en', $terms->content_en ?? '') !!}
+                <label class="form-label">Sīkdatņu politika (EN)</label>
+                <div id="content_en" style="border:1px solid #ccc; min-height:400px; padding:10px;">{!! old('content_en', $cookies->content_en ?? '') !!}
                 </div>
             </div>
 
             @foreach ($languages as $code => $lang)
                 <div class="mb-3">
                     <label class="form-label">
-                        Noteikumi ({{ strtoupper($code) }}) - {{ $lang }}
+                        Sīkdatņu politika ({{ strtoupper($code) }}) - {{ $lang }}
                         <button type="button" class="btn btn-sm btn-outline-secondary translate-btn btn-round mx-4"
                             data-lang="{{ $code == 'ua' ? 'uk' : $code }}" data-type="content">Tulkot no
                             EN</button>
                     </label>
                     <div id="content_{{ $code == 'ua' ? 'uk' : $code }}"
-                        style="border:1px solid #ccc; min-height:400px; padding:10px;">{!! old("content_$code", $terms?->{"content_$code"} ?? '') !!}</div>
+                        style="border:1px solid #ccc; min-height:400px; padding:10px;">{!! old("content_$code", $cookies?->{"content_$code"} ?? '') !!}</div>
                 </div>
             @endforeach
 
@@ -98,7 +98,7 @@
             'content_uk': editorUk
         };
 
-        document.getElementById('termsForm').addEventListener('submit', function(e) {
+        document.getElementById('cookiesForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
             document.getElementById('hidden_content_en').value = editorEn.value;
@@ -107,19 +107,19 @@
             document.getElementById('hidden_content_ua').value = editorUk.value;
 
             if (!editorEn.value.trim()) {
-                Swal.fire('Kļūda', 'Lūdzu ievadiet noteikumus(EN)!', 'warning');
+                Swal.fire('Kļūda', 'Lūdzu ievadiet sīkdatņu politiku(EN)!', 'warning');
                 return;
             }
             if (!editorLv.value.trim()) {
-                Swal.fire('Kļūda', 'Lūdzu ievadiet noteikumus(LV)!', 'warning');
+                Swal.fire('Kļūda', 'Lūdzu ievadiet sīkdatņu politiku(LV)!', 'warning');
                 return;
             }
             if (!editorRu.value.trim()) {
-                Swal.fire('Kļūda', 'Lūdzu ievadiet noteikumus(RU)!', 'warning');
+                Swal.fire('Kļūda', 'Lūdzu ievadiet sīkdatņu politiku(RU)!', 'warning');
                 return;
             }
             if (!editorUk.value.trim()) {
-                Swal.fire('Kļūda', 'Lūdzu ievadiet noteikumus(UA)!', 'warning');
+                Swal.fire('Kļūda', 'Lūdzu ievadiet sīkdatņu politiku(UA)!', 'warning');
                 return;
             }
 

@@ -10,6 +10,7 @@ use App\Models\UserProgress;
 use App\Models\Contacts;
 use App\Models\Terms;
 use App\Models\Privacy;
+use App\Models\Cookies;
 
 class CourseController extends Controller
 {
@@ -419,6 +420,31 @@ class CourseController extends Controller
 
         return view('privacy', [
             'privacy' => $privacy,
+            'title' => $title,
+            'courses' => $courses,
+        ]);
+    }
+    public function showCookies()
+    {
+        $lang = Session::get('lang', 'lv');
+        switch ($lang) {
+            case 'ua':
+                $title = 'Політика щодо файлів cookie';
+                break;
+            case 'ru':
+                $title = 'Политика использования файлов cookie';
+                break;
+            case 'lv':
+                $title = 'Sīkdatņu politika';
+                break;
+            default:
+                $title = 'Cookie Policy';
+        }
+        $cookies = Cookies::first();
+        $courses = Course::all();
+
+        return view('cookies', [
+            'cookies' => $cookies,
             'title' => $title,
             'courses' => $courses,
         ]);

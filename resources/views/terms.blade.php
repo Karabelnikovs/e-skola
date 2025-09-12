@@ -22,7 +22,7 @@
             <div class="card-contact shadow-lg border-0 h-100">
                 <div class="card-body p-4">
                     <div class="mb-5">
-                        <h3 class="fw-bold mb-4 text-primary">
+                        <h3 class="mb-4">
                             {!! $terms->{'content_' . $lang} !!}
                         </h3>
                         <div class="ps-4">
