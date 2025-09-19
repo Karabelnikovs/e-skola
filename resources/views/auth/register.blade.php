@@ -1,6 +1,12 @@
 @extends('layouts.guest')
 @section('content')
     @php
+        $lang = Session::get('lang', 'en');
+
+        $termsUrl = route($lang . '.guest.privacy', ['type' => 'terms']);
+        $privacyUrl = route($lang . '.guest.privacy', ['type' => 'privacy']);
+        $cookiesUrl = route($lang . '.guest.privacy', ['type' => 'cookies']);
+
         $translations = [
             'en' => [
                 'email' => 'Email',
@@ -22,11 +28,17 @@
                 'unique_error' => 'The email address has already been taken.',
                 'bad_email' => 'Email is invalid or cannot receive emails. Try a different one.',
                 'terms_conditions' =>
-                    'I agree to the <a href="#" class="text-purple-500 hover:underline">Terms & Conditions</a>',
+                    'I agree to the <a href="' .
+                    $termsUrl .
+                    '" class="text-purple-500 hover:underline" target="_blank" rel="noopener">Terms &amp; Conditions</a>',
                 'privacy_policy' =>
-                    'I agree to the <a href="#" class="text-purple-500 hover:underline">Privacy Policy</a>',
+                    'I agree to the <a href="' .
+                    $privacyUrl .
+                    '" class="text-purple-500 hover:underline" target="_blank" rel="noopener">Privacy Policy</a>',
                 'cookies_policy' =>
-                    'I agree to the <a href="#" class="text-purple-500 hover:underline">Cookies Policy</a>',
+                    'I agree to the <a href="' .
+                    $cookiesUrl .
+                    '" class="text-purple-500 hover:underline" target="_blank" rel="noopener">Cookies Policy</a>',
                 'checkbox_error' => 'You must accept the terms, privacy policy, and cookies policy to register.',
             ],
             'lv' => [
@@ -49,11 +61,17 @@
                 'unique_error' => 'E-pasta adrese jau ir aizņemta.',
                 'bad_email' => 'E-pasts ir nederīgs vai nevar saņemt e-pastus. Mēģiniet citu.',
                 'terms_conditions' =>
-                    'Es piekrītu <a href="#" class="text-purple-500 hover:underline">Lietošanas noteikumiem</a>',
+                    'Es piekrītu <a href="' .
+                    $termsUrl .
+                    '" class="text-purple-500 hover:underline" target="_blank" rel="noopener">Lietošanas noteikumiem</a>',
                 'privacy_policy' =>
-                    'Es piekrītu <a href="#" class="text-purple-500 hover:underline">Privātuma politikai</a>',
+                    'Es piekrītu <a href="' .
+                    $privacyUrl .
+                    '" class="text-purple-500 hover:underline" target="_blank" rel="noopener">Privātuma politikai</a>',
                 'cookies_policy' =>
-                    'Es piekrītu <a href="#" class="text-purple-500 hover:underline">Sīkdatņu politikai</a>',
+                    'Es piekrītu <a href="' .
+                    $cookiesUrl .
+                    '" class="text-purple-500 hover:underline" target="_blank" rel="noopener">Sīkdatņu politikai</a>',
                 'checkbox_error' =>
                     'Lai reģistrētos, jums ir jāpiekrīt lietošanas noteikumiem, privātuma politikai un sīkdatņu politikai.',
             ],
@@ -78,11 +96,17 @@
                 'bad_email' =>
                     'Электронная почта недействительна или не может получать электронные письма. Попробуйте другую.',
                 'terms_conditions' =>
-                    'Я согласен с <a href="#" class="text-purple-500 hover:underline">Условиями и положениями</a>',
+                    'Я согласен с <a href="' .
+                    $termsUrl .
+                    '" class="text-purple-500 hover:underline" target="_blank" rel="noopener">Условиями и положениями</a>',
                 'privacy_policy' =>
-                    'Я согласен с <a href="#" class="text-purple-500 hover:underline">Политикой конфиденциальности</a>',
+                    'Я согласен с <a href="' .
+                    $privacyUrl .
+                    '" class="text-purple-500 hover:underline" target="_blank" rel="noopener">Политикой конфиденциальности</a>',
                 'cookies_policy' =>
-                    'Я согласен с <a href="#" class="text-purple-500 hover:underline">Политикой использования файлов cookie</a>',
+                    'Я согласен с <a href="' .
+                    $cookiesUrl .
+                    '" class="text-purple-500 hover:underline" target="_blank" rel="noopener">Политикой использования файлов cookie</a>',
                 'checkbox_error' =>
                     'Вы должны принять условия, политику конфиденциальности и политику в отношении файлов cookie для регистрации.',
             ],
@@ -106,17 +130,23 @@
                 'unique_error' => 'Електронна пошта вже зайнята.',
                 'bad_email' => 'Електронна пошта недійсна або не може отримувати електронні листи. Спробуйте іншу.',
                 'terms_conditions' =>
-                    'Я погоджуюся з <a href="#" class="text-purple-500 hover:underline">Правилами та умовами</a>',
+                    'Я погоджуюся з <a href="' .
+                    $termsUrl .
+                    '" class="text-purple-500 hover:underline" target="_blank" rel="noopener">Правилами та умовами</a>',
                 'privacy_policy' =>
-                    'Я погоджуюся з <a href="#" class="text-purple-500 hover:underline">Політикою конфіденційності</a>',
+                    'Я погоджуюся з <a href="' .
+                    $privacyUrl .
+                    '" class="text-purple-500 hover:underline" target="_blank" rel="noopener">Політикою конфіденційності</a>',
                 'cookies_policy' =>
-                    'Я погоджуюся з <a href="#" class="text-purple-500 hover:underline">Політикою щодо файлів cookie</a>',
+                    'Я погоджуюся з <a href="' .
+                    $cookiesUrl .
+                    '" class="text-purple-500 hover:underline" target="_blank" rel="noopener">Політикою щодо файлів cookie</a>',
                 'checkbox_error' =>
                     'Ви повинні прийняти умови, політику конфіденційності та політику щодо файлів cookie, щоб зареєструватися.',
             ],
         ];
-        $lang = Session::get('lang', 'en');
     @endphp
+
 
     <span class="text-2xl font-light">
         <svg xmlns="http://www.w3.org/2000/svg" width="83" height="36" class="mb-4" viewBox="0 0 83 36" fill="none">
@@ -218,22 +248,47 @@
                     <input type="hidden" name="token" value="{{ $prefill->token }}">
                 @endif
 
-                {{-- Added Checkboxes Section --}}
-                <div class="mt-4 space-y-2">
-                    <div class="flex items-center">
-                        <input type="checkbox" id="terms" name="terms" required class="h-4 w-4 rounded">
-                        <label for="terms" class="ml-2 text-sm">{!! $translations[$lang]['terms_conditions'] !!}</label>
-                    </div>
-                    <div class="flex items-center">
-                        <input type="checkbox" id="privacy" name="privacy" required class="h-4 w-4 rounded">
-                        <label for="privacy" class="ml-2 text-sm">{!! $translations[$lang]['privacy_policy'] !!}</label>
-                    </div>
-                    <div class="flex items-center">
-                        <input type="checkbox" id="cookies" name="cookies" required class="h-4 w-4 rounded">
-                        <label for="cookies" class="ml-2 text-sm">{!! $translations[$lang]['cookies_policy'] !!}</label>
-                    </div>
+                <div class="mt-4 space-y-3">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input id="terms" name="terms" type="checkbox" required class="sr-only peer" />
+                        <div class="w-5 h-5 flex items-center justify-center rounded-md border-2 border-gray-300 peer-checked:border-purple-500 peer-checked:bg-purple-500 transition-all peer-focus:ring-2 peer-focus:ring-indigo-300"
+                            aria-hidden="true">
+                            <svg class="w-3 h-3 hidden peer-checked:block text-white" viewBox="0 0 20 20" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4.5 10.5L8.2 14.2L15.5 6.9" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <span class="text-sm">{!! $translations[$lang]['terms_conditions'] !!}</span>
+                    </label>
+
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input id="privacy" name="privacy" type="checkbox" required class="sr-only peer" />
+                        <div class="w-5 h-5 flex items-center justify-center rounded-md border-2 border-gray-300 peer-checked:border-purple-500 peer-checked:bg-purple-500 transition-all peer-focus:ring-2 peer-focus:ring-indigo-300"
+                            aria-hidden="true">
+                            <svg class="w-3 h-3 hidden peer-checked:block text-white" viewBox="0 0 20 20" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4.5 10.5L8.2 14.2L15.5 6.9" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <span class="text-sm">{!! $translations[$lang]['privacy_policy'] !!}</span>
+                    </label>
+
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input id="cookies" name="cookies" type="checkbox" required class="sr-only peer" />
+                        <div class="w-5 h-5 flex items-center justify-center rounded-md border-2 border-gray-300 peer-checked:border-purple-500 peer-checked:bg-purple-500 transition-all peer-focus:ring-2 peer-focus:ring-indigo-300"
+                            aria-hidden="true">
+                            <svg class="w-3 h-3 hidden peer-checked:block text-white" viewBox="0 0 20 20" fill="none"
+                                xmlns="http://www.w3.org/2000/svg">
+                                <path d="M4.5 10.5L8.2 14.2L15.5 6.9" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </div>
+                        <span class="text-sm">{!! $translations[$lang]['cookies_policy'] !!}</span>
+                    </label>
                 </div>
-                {{-- End of Checkboxes Section --}}
+
 
                 <div class="flex justify-between items-baseline">
                     <button type="submit"

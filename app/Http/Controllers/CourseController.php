@@ -449,4 +449,84 @@ class CourseController extends Controller
             'courses' => $courses,
         ]);
     }
+
+    public function guestPrivacy($type)
+    {
+        $lang = Session::get('lang', 'lv');
+
+        switch ($type) {
+            case 'privacy':
+                $terms = Privacy::first();
+                switch ($lang) {
+                    case 'ua':
+                        $title = 'Політика конфіденційності';
+                        break;
+                    case 'ru':
+                        $title = 'Политика конфиденциальности';
+                        break;
+                    case 'lv':
+                        $title = 'Privātuma politika';
+                        break;
+                    default:
+                        $title = 'Privacy Policy';
+                }
+                break;
+            case 'terms':
+                $terms = Terms::first();
+                switch ($lang) {
+                    case 'ua':
+                        $title = 'Умови використання';
+                        break;
+                    case 'ru':
+                        $title = 'Условия использования';
+                        break;
+                    case 'lv':
+                        $title = 'Lietošanas noteikumi';
+                        break;
+                    default:
+                        $title = 'Terms of Use';
+                }
+                break;
+            case 'cookies':
+                $terms = Cookies::first();
+                switch ($lang) {
+                    case 'ua':
+                        $title = 'Політика щодо файлів cookie';
+                        break;
+                    case 'ru':
+                        $title = 'Политика использования файлов cookie';
+                        break;
+                    case 'lv':
+                        $title = 'Sīkdatņu politika';
+                        break;
+                    default:
+                        $title = 'Cookie Policy';
+                }
+                break;
+            default:
+                $terms = Terms::first();
+                switch ($lang) {
+                    case 'ua':
+                        $title = 'Умови використання';
+                        break;
+                    case 'ru':
+                        $title = 'Условия использования';
+                        break;
+                    case 'lv':
+                        $title = 'Lietošanas noteikumi';
+                        break;
+                    default:
+                        $title = 'Terms of Use';
+                }
+                break;
+        }
+
+
+
+
+        return view('guestPrivacy', [
+            'terms' => $terms,
+            'title' => $title,
+        ]);
+    }
 }

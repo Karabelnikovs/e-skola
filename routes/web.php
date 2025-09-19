@@ -21,6 +21,10 @@ Route::get('/', [LoginController::class, 'home'])->name('home');
 $locales = config('locale.supported');
 foreach ($locales as $locale) {
     Route::prefix($locale)->middleware('web')->group(function () use ($locale) {
+
+        // policies
+        Route::get('/policy/{type}', [CourseController::class, 'guestPrivacy'])->name($locale . '.guest.privacy');
+
         // default auth
         Route::get('/login', [LoginController::class, 'showLoginForm'])->name($locale . '.login');
         Route::post('/login', [LoginController::class, 'login'])->name($locale . '.login.post');
