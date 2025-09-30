@@ -34,7 +34,7 @@
 <body>
     <div
         class="relative flex min-h-screen text-gray-800 antialiased flex-col justify-center overflow-hidden bg-gray-50 py-6 sm:py-12 items-center px-6">
-        <div class="relative py-3 sm:w-96 w-full text-center">
+        <div class="relative py-3 sm:w-96 xl:w-1/2 w-full text-center">
             @php
                 $segments = request()->segments();
                 $currentLocale = $segments[0] ?? 'lv';
