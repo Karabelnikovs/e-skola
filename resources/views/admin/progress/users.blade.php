@@ -39,6 +39,7 @@
                             <div id="add-row_filter" class="dataTables_filter"></div>
                         </div>
                     </div>
+                    {{-- @dd($items) --}}
                     <div class="row">
                         <div class="col-sm-12">
                             <table id="add-row" class="display table table-striped table-hover" role="grid"
@@ -49,6 +50,7 @@
                                         <th>Progress</th>
                                         <th>Sertifikāts</th>
                                         <th>Darbība</th>
+                                        <th>Pēdējā aktivitāte</th>
                                     </tr>
                                 </thead>
                                 <tfoot>
@@ -57,17 +59,18 @@
                                         <th>Progress</th>
                                         <th>Sertifikāts</th>
                                         <th>Darbība</th>
+                                        <th>Pēdējā aktivitāte</th>
                                     </tr>
                                 </tfoot>
                                 <tbody>
-                                    {{-- @dd($items) --}}
+
                                     @foreach ($items as $item)
                                         <tr role="row">
                                             <td class="text-center">{{ $item->name }}</td>
                                             <td class="text-center">
                                                 <div class="progress w-75" style="height: 25px;">
-                                                    <div class="progress-bar progress-bar-striped bg-success"
-                                                        role="progressbar" style="width: {{ $item->percentage }}%"
+                                                    <div class="progress-bar progress-bar-striped bg-success" role="progressbar"
+                                                        style="width: {{ $item->percentage }}%"
                                                         aria-valuenow="{{ $item->percentage }}" aria-valuemin="0"
                                                         aria-valuemax="100">
                                                         {{ round($item->percentage) }}%
@@ -93,6 +96,10 @@
                                                         <i class="fas fa-angle-right"></i></a>
                                                 </div>
                                             </td>
+                                            <td class="text-center"
+                                                data-order="{{ \Carbon\Carbon::parse($item->updated_at)->timestamp }}">
+                                                {{ \Carbon\Carbon::parse($item->updated_at)->format('d/m/Y H:i') }}
+                                            </td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -115,7 +122,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#add-row').DataTable({
                 "pageLength": 10,
                 "lengthMenu": [10, 25, 50, 100],
@@ -124,7 +131,7 @@
                     "targets": 3
                 }],
                 "order": [
-                    [0, 'asc']
+                    [4, 'desc']
                 ],
                 "language": {
                     "search": "Meklēt:",
