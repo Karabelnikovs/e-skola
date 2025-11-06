@@ -22,8 +22,24 @@
     @endif
     <div class="col-md-12">
         <div class="card-header">
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center justify-content-between flex-wrap">
                 <h4 class="card-title">Lietotāju progress</h4>
+                <form action="{{ route('users-progress.export') }}" method="GET" class="d-flex align-items-center"
+                    style="gap: 10px;">
+                    <div class="d-flex align-items-center" style="gap: 5px;">
+                        <label for="from_date" class="mb-0">No:</label>
+                        <input type="date" id="from_date" name="from_date" class="form-control form-control-sm"
+                            value="{{ request('from_date') }}" style="width: 150px;">
+                    </div>
+                    <div class="d-flex align-items-center" style="gap: 5px;">
+                        <label for="to_date" class="mb-0">Līdz:</label>
+                        <input type="date" id="to_date" name="to_date" class="form-control form-control-sm"
+                            value="{{ request('to_date') }}" style="width: 150px;">
+                    </div>
+                    <button type="submit" class="btn btn-success btn-round">
+                        <i class="fas fa-file-excel"></i> Eksportēt uz Excel
+                    </button>
+                </form>
             </div>
         </div>
         <div class="card-body">
@@ -68,13 +84,16 @@
                                         <tr role="row">
                                             <td class="text-center">{{ $item->name }}</td>
                                             <td class="text-center">
-                                                <div class="progress w-75" style="height: 25px;">
+                                                <div class="progress w-75" style="height: 25px; position: relative;">
                                                     <div class="progress-bar progress-bar-striped bg-success" role="progressbar"
                                                         style="width: {{ $item->percentage }}%"
                                                         aria-valuenow="{{ $item->percentage }}" aria-valuemin="0"
                                                         aria-valuemax="100">
-                                                        {{ round($item->percentage) }}%
                                                     </div>
+                                                    <span
+                                                        style="position: absolute; left: 50%; transform: translateX(-50%); font-weight: 900; color: {{ round($item->percentage) >= 50 ? '#ffffff' : '#000000' }}; text-shadow: {{ round($item->percentage) >= 30 ? '1px 1px 2px rgba(0,0,0,0.5)' : '1px 1px 2px rgba(255,255,255,0.8)' }}; line-height: 25px;">
+                                                        {{ round($item->percentage) }}%
+                                                    </span>
                                                 </div>
                                             </td>
                                             <td class="text-center">

@@ -32,17 +32,16 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <div class="progress w-75" style="height: 25px;">
+                                            <div class="progress w-75" style="height: 25px; position: relative;">
                                                 <div class="progress-bar progress-bar-striped bg-success" role="progressbar"
-                                                    style="width: {{ $prog->percentage }}%"
-                                                    aria-valuenow="{{ $prog->percentage }}" aria-valuemin="0"
-                                                    aria-valuemax="100">
-                                                    {{ round($prog->percentage) }}%
+                                                    style="width: {{ $prog->percentage }}%" aria-valuenow="{{ $prog->percentage }}"
+                                                    aria-valuemin="0" aria-valuemax="100">
                                                 </div>
+                                                <span
+                                                    style="position: absolute; left: 50%; transform: translateX(-50%); font-weight: 900; color: {{ round($prog->percentage) >= 50 ? '#ffffff' : '#000000' }}; text-shadow: {{ round($prog->percentage) >= 30 ? '1px 1px 2px rgba(0,0,0,0.5)' : '1px 1px 2px rgba(255,255,255,0.8)' }}; line-height: 25px;">
+                                                    {{ round($prog->percentage) }}%
+                                                </span>
                                             </div>
-                                            <span class="badge bg-primary rounded-pill">
-                                                {{ $prog->completed_items }}/{{ $prog->total_items }}
-                                            </span>
                                         </div>
 
                                         <div class="row text-center small">

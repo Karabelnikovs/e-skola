@@ -18,6 +18,7 @@ use App\Models\Terms;
 use App\Models\Privacy;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\UsersImport;
+use App\Exports\CertificatesExport;
 use App\Models\Course;
 use App\Models\Cookies;
 
@@ -1396,6 +1397,99 @@ class AdminController extends Controller
         $title = 'Lietotāju sertifikāti';
         return view('admin.progress.users', compact('title', 'items', 'courses'));
     }
+
+    public function exportCertificates(Request $request)
+    {
+        $query = DB::table('user_progress')
+            ->join('users', 'user_progress.user_id', '=', 'users.id')
+            ->join('courses', 'user_progress.course_id', '=', 'courses.id')
+            ->leftJoin('certificates', function ($join) {
+                $join->on('user_progress.user_id', '=', 'certificates.user_id')
+                    ->on('user_progress.course_id', '=', 'certificates.course_id');
+            })
+            ->select(
+                'users.id as user_id',
+                'users.name',
+                'users.email',
+                'courses.id as course_id',
+                'courses.title_lv as course_title_lv',
+                'user_progress.current_order',
+                'user_progress.updated_at',
+                'user_progress.created_at',
+                DB::raw('MAX(certificates.created_at) as certificate_date'),
+            )
+            ->groupBy(
+                'users.id',
+                'courses.id',
+                'users.name',
+                'users.email',
+                'courses.title_lv',
+                'user_progress.current_order',
+                'user_progress.updated_at',
+                'user_progress.created_at',
+            );
+
+
+        if ($request->has('from_date') && $request->from_date) {
+            $query->whereDate('user_progress.updated_at', '>=', $request->from_date);
+        }
+
+        if ($request->has('to_date') && $request->to_date) {
+            $query->whereDate('user_progress.updated_at', '<=', $request->to_date);
+        }
+
+        $items = $query->orderBy('user_progress.updated_at', 'desc')->get();
+
+        if ($items->isEmpty()) {
+            return redirect()->route('users-progress')->with('error', 'Nav datu eksportam!');
+        }
+
+        $courseIds = $items->pluck('course_id')->unique();
+
+        $testsCounts = DB::table('tests')
+            ->whereIn('course_id', $courseIds)
+            ->select('course_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('course_id')
+            ->get()->keyBy('course_id');
+
+        $topicsCounts = DB::table('topics')
+            ->whereIn('course_id', $courseIds)
+            ->select('course_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('course_id')
+            ->get()->keyBy('course_id');
+
+        $dictionariesCounts = DB::table('dictionaries')
+            ->whereIn('course_id', $courseIds)
+            ->select('course_id', DB::raw('COUNT(*) as count'))
+            ->groupBy('course_id')
+            ->get()->keyBy('course_id');
+
+        $items->transform(function ($progressItem) use ($testsCounts, $topicsCounts, $dictionariesCounts) {
+            $courseId = $progressItem->course_id;
+
+            $tests = $testsCounts->get($courseId)->count ?? 0;
+            $topics = $topicsCounts->get($courseId)->count ?? 0;
+            $dictionaries = $dictionariesCounts->get($courseId)->count ?? 0;
+
+            $totalItems = $tests + $topics + $dictionaries;
+            $completedItems = $progressItem->current_order;
+
+            $percentage = $totalItems > 0
+                ? min(($completedItems / $totalItems) * 100, 100)
+                : 0;
+
+            $progressItem->total_items = $totalItems;
+            $progressItem->percentage = round($percentage, 2);
+            $progressItem->completed_items = $completedItems;
+
+            return $progressItem;
+        });
+
+        $fileName = 'sertifikati_' . date('Y-m-d_His') . '.xlsx';
+
+        return Excel::download(new CertificatesExport($items), $fileName);
+    }
+
     public function progress($userID)
     {
         $courses = DB::table('courses')->get();

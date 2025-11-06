@@ -158,6 +158,7 @@ Route::middleware(['AdminCheck'])->group(function () {
     Route::post('rules/store', [AdminController::class, 'storeTerms'])->name('rules.store');
 
     Route::get('users-progress', [AdminController::class, 'usersProgress'])->name('users-progress');
+    Route::get('users-progress/export', [AdminController::class, 'exportCertificates'])->name('users-progress.export');
     Route::get('progress/{id}', [AdminController::class, 'progress'])->name('user.progress');
     Route::post('/test/{test}/toggle-final', [AdminController::class, 'toggleFinal'])->name('test.toggleFinal');
     Route::post('/module/{module}/toggle-public', [AdminController::class, 'togglePublic'])->name('module.togglePublic');
