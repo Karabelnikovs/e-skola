@@ -110,20 +110,24 @@ Route::middleware(['AdminCheck'])->group(function () {
 
 
     Route::get('/module/edit/{id}', [AdminController::class, 'edit'])->name('module.edit');
+    Route::get('/module/update/{id}', [AdminController::class, 'redirectModuleUpdate'])->name('module.update.redirect');
     Route::post('/module/update/{id}', [AdminController::class, 'update'])->name('module.update');
 
     Route::get('test/new/{id}', [AdminController::class, 'newTest'])->name('test.new');
     Route::post('tests/store', [AdminController::class, 'storeTest'])->name('test.store');
     Route::get('test/edit/{id}/{course_id}', [AdminController::class, 'editTest'])->name('test.edit');
+    Route::get('test/update/{id}', [AdminController::class, 'redirectTestUpdate'])->name('test.update.redirect');
     Route::post('test/update/{id}', [AdminController::class, 'updateTest'])->name('test.update');
 
     Route::get('topic/new/{id}', [AdminController::class, 'newTopic'])->name('topic.new');
     Route::post('topics/store', [AdminController::class, 'storeTopic'])->name('topics.store');
     Route::get('topic/edit/{id}/{course_id}', [AdminController::class, 'editTopic'])->name('topic.edit');
+    Route::get('topic/update/{id}', [AdminController::class, 'redirectTopicUpdate'])->name('topic.update.redirect');
     Route::post('topic/update/{id}', [AdminController::class, 'updateTopic'])->name('topic.update');
 
     Route::get('dictionary/new/{id}', [AdminController::class, 'newDictionary'])->name('dictionary.new');
     Route::post('dictionary/store', [AdminController::class, 'storeDictionary'])->name('dictionary.store');
+    Route::get('dictionary/update/{id}', [AdminController::class, 'redirectDictionaryUpdate'])->name('dictionary.update.redirect');
     Route::post('dictionary/update/{id}', [AdminController::class, 'updateDictionary'])->name('dictionary.update');
     Route::post('translation/store/{dictionaryId}', [AdminController::class, 'storeTranslation'])->name('translation.store');
     Route::post('translation/update/{id}', [AdminController::class, 'updateTranslation'])->name('translation.update');

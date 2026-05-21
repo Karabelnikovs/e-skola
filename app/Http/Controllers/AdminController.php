@@ -21,6 +21,7 @@ use App\Imports\UsersImport;
 use App\Exports\CertificatesExport;
 use App\Models\Course;
 use App\Models\Cookies;
+use App\Support\AdminFormRedirect;
 
 class AdminController extends Controller
 {
@@ -400,6 +401,26 @@ class AdminController extends Controller
 
         $topic = DB::table('topics')->where('id', $id)->first();
         return view('admin.topic', compact('topic', 'title', 'courses', 'course_id'));
+    }
+
+    public function redirectTopicUpdate($id)
+    {
+        return AdminFormRedirect::topic((int) $id);
+    }
+
+    public function redirectTestUpdate($id)
+    {
+        return AdminFormRedirect::test((int) $id);
+    }
+
+    public function redirectModuleUpdate($id)
+    {
+        return AdminFormRedirect::module((int) $id);
+    }
+
+    public function redirectDictionaryUpdate($id)
+    {
+        return AdminFormRedirect::dictionary((int) $id);
     }
 
     public function updateTopic(Request $request, $id)

@@ -315,6 +315,13 @@
             <div class="container">
                 <div class="page-inner">
                     <div class="card">
+                        @if (session('info'))
+                            <script>
+                                document.addEventListener('DOMContentLoaded', () => {
+                                    Swal.fire('Info', @json(session('info')), 'info');
+                                });
+                            </script>
+                        @endif
                         @yield('content')
 
                     </div>

@@ -19,9 +19,6 @@
         <form method="POST" action="{{ isset($topic) ? route('topic.update', $topic->id) : route('topics.store') }}"
             id="topicForm">
             @csrf
-            @if (isset($topic))
-                @method('POST')
-            @endif
             <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
 
                 <a href='/module/{{ $module->id ?? $topic->course_id }}' class="btn btn-label-info btn-round me-2 mb-3"><i
@@ -118,44 +115,37 @@
             height: 400
         };
 
-        window.editorEn = Jodit.make('#content_en', joditConfig);
-        window.editorLv = Jodit.make('#content_lv', joditConfig);
-        window.editorRu = Jodit.make('#content_ru', joditConfig);
-        window.editorUk = Jodit.make('#content_uk', joditConfig);
+        if (typeof Jodit !== 'undefined') {
+            window.editorEn = Jodit.make('#content_en', joditConfig);
+            window.editorLv = Jodit.make('#content_lv', joditConfig);
+            window.editorRu = Jodit.make('#content_ru', joditConfig);
+            window.editorUk = Jodit.make('#content_uk', joditConfig);
+        }
 
         document.getElementById('topicForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+            const titles = {
+                lv: document.getElementById('title_lv').value.trim(),
+                en: document.getElementById('title_en').value.trim(),
+                ru: document.getElementById('title_ru').value.trim(),
+                ua: document.getElementById('title_uk').value.trim(),
+            };
+            const labels = { lv: 'LV', en: 'EN', ru: 'RU', ua: 'UA' };
+            for (const [code, value] of Object.entries(titles)) {
+                if (!value) {
+                    e.preventDefault();
+                    Swal.fire('Kļūda', `Lūdzu ievadiet tēmas nosaukumu(${labels[code]})!`, 'warning');
+                    return;
+                }
+            }
 
-            document.getElementById('hidden_content_en').value = editorEn.value;
-            document.getElementById('hidden_content_lv').value = editorLv.value;
-            document.getElementById('hidden_content_ru').value = editorRu.value;
-            document.getElementById('hidden_content_ua').value = editorUk.value;
-
-            this.submit();
-        });
-    </script>
-    <script>
-        document.getElementById('topicForm').addEventListener('submit', function(e) {
-            const title_lv = document.getElementById('title_lv').value.trim();
-            const title_en = document.getElementById('title_en').value.trim();
-            const title_ru = document.getElementById('title_ru').value.trim();
-            const title_ua = document.getElementById('title_uk').value.trim();
-            if (!title_lv) {
-                e.preventDefault();
-                Swal.fire('Kļūda', 'Lūdzu ievadiet tēmas nosaukumu(LV)!', 'warning');
-            }
-            if (!title_en) {
-                e.preventDefault();
-                Swal.fire('Kļūda', 'Lūdzu ievadiet tēmas nosaukumu(EN)!', 'warning');
-            }
-            if (!title_ru) {
-                e.preventDefault();
-                Swal.fire('Kļūda', 'Lūdzu ievadiet tēmas nosaukumu(RU)!', 'warning');
-            }
-            if (!title_ua) {
-                e.preventDefault();
-                Swal.fire('Kļūda', 'Lūdzu ievadiet tēmas nosaukumu(UA)!', 'warning');
-            }
+            const sync = (hiddenId, editor, fallbackId) => {
+                const el = document.getElementById(hiddenId);
+                el.value = editor ? editor.value : (document.getElementById(fallbackId)?.innerHTML || '');
+            };
+            sync('hidden_content_en', window.editorEn, 'content_en');
+            sync('hidden_content_lv', window.editorLv, 'content_lv');
+            sync('hidden_content_ru', window.editorRu, 'content_ru');
+            sync('hidden_content_ua', window.editorUk, 'content_uk');
         });
     </script>
     <script>
