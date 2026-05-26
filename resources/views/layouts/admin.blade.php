@@ -12,6 +12,7 @@
     {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
 
     <!-- Fonts and icons -->
+    @php($adminFontsCss = asset('assets/admin/assets/css/fonts.min.css'))
     <script src="{{ asset('assets/admin/assets/js/plugin/webfont/webfont.min.js') }}"></script>
 
     <script>
@@ -26,7 +27,7 @@
                     "Font Awesome 5 Brands",
                     "simple-line-icons",
                 ],
-                urls: ["{{ asset('assets/admin/assets/css/fonts.min.css') }}"],
+                urls: {!! json_encode([$adminFontsCss]) !!},
             },
             active: function() {
                 sessionStorage.fonts = true;

@@ -3,7 +3,12 @@
     <div class="card-body">
         @if (session('success'))
             <script>
-                Swal.fire('Veiksmīgi!', '{{ session('success') }}', 'success');
+                Swal.fire('Veiksmīgi!', @json(session('success')), 'success');
+            </script>
+        @endif
+        @if (session('save_error'))
+            <script>
+                Swal.fire('Saglabāšana neizdevās', @json(session('save_error')), 'error');
             </script>
         @endif
         @if ($errors->any())
@@ -16,8 +21,12 @@
             </script>
         @endif
 
-        <form method="POST" action="{{ isset($topic) ? route('topic.update', $topic->id) : route('topics.store') }}"
-            id="topicForm">
+        @php
+            $topicStoreUrl = isset($topic)
+                ? route('topic.save', $topic->id, absolute: false)
+                : route('topics.store', array_filter(['course_id' => $module->id ?? ($topic->course_id ?? null)]), absolute: false);
+        @endphp
+        <form method="POST" action="{{ $topicStoreUrl }}" id="topicForm">
             @csrf
             <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row">
 
@@ -51,8 +60,7 @@
                             EN</button>
                     </label>
                     <input type="text" class="form-control" id="title_{{ $code == 'ua' ? 'uk' : $code }}"
-                        name="title_{{ $code }}"
-                        value="{{ old('title_' . $code, $topic->{'title_' . $code} ?? '') }}">
+                        name="title_{{ $code }}" value="{{ old('title_' . $code, $topic->{'title_' . $code} ?? '') }}">
                 </div>
             @endforeach
 
@@ -64,7 +72,9 @@
             <div class="mb-3">
                 <label class="form-label">Saturs (EN)</label>
                 <div id="content_en" data-editable data-name="content_en"
-                    style="border:1px solid #ccc; min-height:400px; padding:10px;">{!! old('content_en', $topic->content_en ?? '') !!}</div>
+                    style="border:1px solid #ccc; min-height:400px; padding:10px;">
+                    {!! old('content_en', $topic->content_en ?? '') !!}
+                </div>
             </div>
 
             @foreach ($languages as $code => $lang)
@@ -72,9 +82,10 @@
                     <label class="form-label">
                         Saturs ({{ strtoupper($code) }}) - {{ $lang }}
                     </label>
-                    <div id="content_{{ $code == 'ua' ? 'uk' : $code }}" data-editable
-                        data-name="content_{{ $code }}"
-                        style="border:1px solid #ccc; min-height:400px; padding:10px;">{!! old("content_$code", $topic?->{"content_$code"} ?? '') !!}</div>
+                    <div id="content_{{ $code == 'ua' ? 'uk' : $code }}" data-editable data-name="content_{{ $code }}"
+                        style="border:1px solid #ccc; min-height:400px; padding:10px;">
+                        {!! old("content_$code", $topic?->{"content_$code"} ?? '') !!}
+                    </div>
                 </div>
             @endforeach
 
@@ -96,10 +107,10 @@
                 pathVariableName: 'path',
                 format: 'json',
                 method: 'POST',
-                isSuccess: function(resp) {
+                isSuccess: function (resp) {
                     return !!resp.location;
                 },
-                process: function(resp) {
+                process: function (resp) {
                     return {
                         files: [resp.location],
                         error: '',
@@ -108,7 +119,7 @@
                         isImages: [true]
                     };
                 },
-                error: function(e) {
+                error: function (e) {
                     console.error('Upload error:', e);
                 }
             },
@@ -122,7 +133,8 @@
             window.editorUk = Jodit.make('#content_uk', joditConfig);
         }
 
-        document.getElementById('topicForm').addEventListener('submit', function(e) {
+        document.getElementById('topicForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
             const titles = {
                 lv: document.getElementById('title_lv').value.trim(),
                 en: document.getElementById('title_en').value.trim(),
@@ -132,7 +144,6 @@
             const labels = { lv: 'LV', en: 'EN', ru: 'RU', ua: 'UA' };
             for (const [code, value] of Object.entries(titles)) {
                 if (!value) {
-                    e.preventDefault();
                     Swal.fire('Kļūda', `Lūdzu ievadiet tēmas nosaukumu(${labels[code]})!`, 'warning');
                     return;
                 }
@@ -146,6 +157,40 @@
             sync('hidden_content_lv', window.editorLv, 'content_lv');
             sync('hidden_content_ru', window.editorRu, 'content_ru');
             sync('hidden_content_ua', window.editorUk, 'content_uk');
+
+            const form = this;
+            const btn = form.querySelector('[type=submit]');
+            btn.disabled = true;
+            try {
+                const res = await fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    credentials: 'same-origin',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                });
+                const data = await res.json().catch(() => ({}));
+                if (res.ok && data.redirect) {
+                    window.location.href = data.redirect;
+                    return;
+                }
+                if (res.status === 422 && data.errors) {
+                    const msg = Object.values(data.errors).flat().join('<br>');
+                    Swal.fire({ icon: 'error', title: 'Kļūda!', html: msg });
+                    return;
+                }
+                if (res.status === 419) {
+                    Swal.fire('Sesija beigusies', 'Lūdzu atsvaidziniet lapu un mēģiniet vēlreiz.', 'error');
+                    return;
+                }
+                Swal.fire('Kļūda', 'Saglabāšana neizdevās (HTTP ' + res.status + ').', 'error');
+            } catch (err) {
+                Swal.fire('Kļūda', 'Neizdevās nosūtīt datus uz serveri.', 'error');
+            } finally {
+                btn.disabled = false;
+            }
         });
     </script>
     <script>
@@ -167,7 +212,7 @@
         }
 
         document.querySelectorAll('.translate-btn').forEach(btn => {
-            btn.addEventListener('click', async function() {
+            btn.addEventListener('click', async function () {
                 const lang = this.dataset.lang;
                 const type = this.dataset.type;
                 const sourceId = 'title_en';

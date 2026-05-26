@@ -28,9 +28,20 @@ class AppServiceProvider extends ServiceProvider
         $appUrl = config('app.url');
         if ($appUrl) {
             URL::forceRootUrl(rtrim($appUrl, '/'));
-            if (!$this->app->environment('local') && str_starts_with($appUrl, 'https://')) {
-                URL::forceScheme('https');
-            }
         }
+
+        if ($this->app->environment('local')) {
+            return;
+        }
+
+        $this->app->booted(function () {
+            if (request()->isSecure()) {
+                URL::forceScheme('https');
+                config(['session.secure' => true]);
+            } elseif (str_starts_with((string) config('app.url'), 'https://')) {
+                URL::forceScheme('https');
+                config(['session.secure' => true]);
+            }
+        });
     }
 }

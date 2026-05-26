@@ -5,6 +5,9 @@
 
     RewriteEngine On
 
+    # Route legacy /storage/uploads/* through Laravel when Apache would 403/404 the symlink.
+    RewriteRule ^storage/uploads/(.+)$ media/uploads/$1 [PT,L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
@@ -16,7 +19,7 @@
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
-    RewriteRule ^ %1 [L,R=301]
+    RewriteRule ^ %1 [L,R=308]
 
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d

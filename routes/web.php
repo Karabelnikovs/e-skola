@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\TestController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PublicFileController;
 use App\Http\Middleware\AuthCheck;
 use App\Http\Middleware\AdminCheck;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -16,6 +17,14 @@ use App\Http\Controllers\Auth\VerificationController;
 use Illuminate\Support\Facades\Mail;
 
 Route::get('/', [LoginController::class, 'home'])->name('home');
+
+// Serve uploaded files through Laravel (works when public/storage symlink or permissions fail).
+Route::get('media/{path}', [PublicFileController::class, 'show'])
+    ->where('path', '.*')
+    ->name('media.public');
+Route::get('storage/uploads/{filename}', [PublicFileController::class, 'show'])
+    ->where('filename', '[A-Za-z0-9._\-]+')
+    ->name('storage.uploads.legacy');
 
 // Global login alias so Laravel's built-in redirects (password reset, Authenticate middleware) work.
 Route::get('/login', function () {
@@ -125,10 +134,12 @@ Route::middleware(['AdminCheck'])->group(function () {
     Route::post('test/update/{id}', [AdminController::class, 'updateTest'])->name('test.update');
 
     Route::get('topic/new/{id}', [AdminController::class, 'newTopic'])->name('topic.new');
+    Route::get('topics/store', fn (\Illuminate\Http\Request $request) => \App\Support\AdminFormRedirect::topicStore($request));
     Route::post('topics/store', [AdminController::class, 'storeTopic'])->name('topics.store');
     Route::get('topic/edit/{id}/{course_id}', [AdminController::class, 'editTopic'])->name('topic.edit');
     Route::get('topic/update/{id}', [AdminController::class, 'redirectTopicUpdate'])->name('topic.update.redirect');
     Route::post('topic/update/{id}', [AdminController::class, 'updateTopic'])->name('topic.update');
+    Route::post('topic/save/{id}', [AdminController::class, 'updateTopic'])->name('topic.save');
 
     Route::get('dictionary/new/{id}', [AdminController::class, 'newDictionary'])->name('dictionary.new');
     Route::post('dictionary/store', [AdminController::class, 'storeDictionary'])->name('dictionary.store');

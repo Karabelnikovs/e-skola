@@ -14,7 +14,8 @@
         <div class="d-flex align-items-left align-items-md-center flex-column flex-md-row pt-2 pb-4">
             <div>
                 <h2 class="font-bold mb-2 text-4xl">
-                    {{ isset($module) ? 'Rediģēt Moduli' : 'Jauns Modulis' }}</h2>
+                    {{ isset($contacts) ? 'Rediģēt Kontaktinformāciju' : 'Jauna Kontaktinformācija' }}
+                </h2>
             </div>
         </div>
         <form id="contactForm">
@@ -44,8 +45,7 @@
                 @php $phones = json_decode($contacts->phone_numbers ?? '[]', true); @endphp
                 @foreach ($phones as $phone)
                     <div>
-                        <input name="phones[]" type="text" class="form-control d-inline-block w-75 mb-2"
-                            value="{{ $phone }}" />
+                        <input name="phones[]" type="text" class="form-control d-inline-block w-75 mb-2" value="{{ $phone }}" />
                         <span class="remove-btn">✕</span>
                     </div>
                 @endforeach
@@ -99,7 +99,7 @@
 
             const div = document.createElement('div');
             div.innerHTML = `<input name="${sectionId}[]" type="${sectionId === 'emails' ? 'email' : 'text'}" class="form-control d-inline-block w-75 mb-2" />
-                     <span class="remove-btn">✕</span>`;
+                         <span class="remove-btn">✕</span>`;
             section.appendChild(div);
 
             div.querySelector('.remove-btn').addEventListener('click', () => div.remove());
@@ -112,17 +112,17 @@
             });
         });
 
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
+        document.getElementById('contactForm').addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = new FormData(this);
 
             fetch('/contact-section/store', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: formData
-                })
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: formData
+            })
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {

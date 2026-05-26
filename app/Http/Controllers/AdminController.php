@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Topic;
 use App\Models\Test;
 use App\Models\Question;
 use Illuminate\Support\Facades\Http;
@@ -331,6 +330,12 @@ class AdminController extends Controller
         if (!session('is_admin')) {
             return redirect()->route('courses.index');
         }
+
+        Log::info('topics.store POST', [
+            'content_length' => $request->header('Content-Length'),
+            'has_title_lv' => $request->filled('title_lv'),
+        ]);
+
         $request->validate(
             [
                 'course_id' => 'required|exists:courses,id',
@@ -386,7 +391,12 @@ class AdminController extends Controller
         ];
         DB::table('topics')->insert($data);
 
-        return redirect()->route('module', $request->input('course_id'))->with('success', 'Tēma izveidota!');
+        $redirect = redirect()->route('module', $request->input('course_id'))->with('success', 'Tēma izveidota!');
+        if ($request->expectsJson()) {
+            return response()->json(['redirect' => $redirect->getTargetUrl()]);
+        }
+
+        return $redirect;
     }
 
 
@@ -403,9 +413,9 @@ class AdminController extends Controller
         return view('admin.topic', compact('topic', 'title', 'courses', 'course_id'));
     }
 
-    public function redirectTopicUpdate($id)
+    public function redirectTopicUpdate(Request $request, $id)
     {
-        return AdminFormRedirect::topic((int) $id);
+        return AdminFormRedirect::topic((int) $id, $request);
     }
 
     public function redirectTestUpdate($id)
@@ -425,7 +435,13 @@ class AdminController extends Controller
 
     public function updateTopic(Request $request, $id)
     {
-        // dd($request->all());
+        Log::info('topic.update POST', [
+            'id' => $id,
+            'content_length' => $request->header('Content-Length'),
+            'has_title_lv' => $request->filled('title_lv'),
+            'has_content_en' => $request->filled('content_en'),
+        ]);
+
         $data = $request->validate(
             [
                 'course_id' => 'required|exists:courses,id',
@@ -461,11 +477,21 @@ class AdminController extends Controller
         );
 
 
-        $topic = Topic::findOrFail($id);
-        $topic->update($data);
+        if (!DB::table('topics')->where('id', $id)->exists()) {
+            abort(404);
+        }
 
-        $course_id = $topic->course_id;
-        return redirect()->route('topic.edit', [$id, $course_id])->with('success', 'Tēma atjaunota!');
+        $rows = DB::table('topics')->where('id', $id)->update($data);
+        $course_id = DB::table('topics')->where('id', $id)->value('course_id');
+
+        Log::info('topic.update saved', ['id' => $id, 'rows' => $rows]);
+
+        $redirect = redirect()->route('topic.edit', [$id, $course_id])->with('success', 'Tēma atjaunota!');
+        if ($request->expectsJson()) {
+            return response()->json(['redirect' => $redirect->getTargetUrl()]);
+        }
+
+        return $redirect;
     }
 
 
