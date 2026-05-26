@@ -10,6 +10,10 @@ return new class extends Migration {
      */
     public function up()
     {
+        if (Schema::hasTable('answers')) {
+            return;
+        }
+
         Schema::create('answers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('attempt_id')->constrained()->onDelete('cascade');

@@ -82,8 +82,9 @@ class TestController extends Controller
             }
 
             $lang = Session::get('lang', 'lv');
-            $optionsField = 'options_' . ($lang === 'ua' ? 'uk' : $lang);
-            $options = json_decode($question->$optionsField) ?? explode(',', $question->$optionsField);
+            $optionsField = 'options_' . $lang;
+            $raw = $question->{$optionsField} ?? $question->options_en ?? '';
+            $options = json_decode($raw, true) ?? (is_string($raw) ? explode(',', $raw) : []);
 
             $correctIndex = (int) $question->correct_answer;
             $correctAnswer = $options[$correctIndex] ?? null;
@@ -115,8 +116,9 @@ class TestController extends Controller
             $question = $questions->where('id', $questionId)->first();
 
             $lang = Session::get('lang', 'lv');
-            $optionsField = 'options_' . ($lang === 'ua' ? 'uk' : $lang);
-            $options = json_decode($question->$optionsField) ?? explode(',', $question->$optionsField);
+            $optionsField = 'options_' . $lang;
+            $raw = $question->{$optionsField} ?? $question->options_en ?? '';
+            $options = json_decode($raw, true) ?? (is_string($raw) ? explode(',', $raw) : []);
 
             $submittedIndex = array_search($submittedAnswer, $options);
 
@@ -141,8 +143,9 @@ class TestController extends Controller
         if ($passed) {
             foreach ($questions as $question) {
                 $lang = Session::get('lang', 'lv');
-                $optionsField = 'options_' . ($lang === 'ua' ? 'uk' : $lang);
-                $options = json_decode($question->$optionsField) ?? explode(',', $question->$optionsField);
+                $optionsField = 'options_' . $lang;
+                $raw = $question->{$optionsField} ?? $question->options_en ?? '';
+                $options = json_decode($raw, true) ?? (is_string($raw) ? explode(',', $raw) : []);
                 $correctIndex = (int) $question->correct_answer;
                 $correctAnswers[$question->id] = $options[$correctIndex] ?? null;
             }

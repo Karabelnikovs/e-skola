@@ -17,6 +17,11 @@ use Illuminate\Support\Facades\Mail;
 
 Route::get('/', [LoginController::class, 'home'])->name('home');
 
+// Global login alias so Laravel's built-in redirects (password reset, Authenticate middleware) work.
+Route::get('/login', function () {
+    $locale = session('lang', config('locale.supported')[0] ?? 'lv');
+    return redirect()->route($locale . '.login');
+})->name('login');
 
 $locales = config('locale.supported');
 foreach ($locales as $locale) {

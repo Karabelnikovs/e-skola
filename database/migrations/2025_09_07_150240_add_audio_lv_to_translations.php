@@ -7,8 +7,12 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (!Schema::hasTable('translations') || Schema::hasColumn('translations', 'audio_lv')) {
+            return;
+        }
+
         Schema::table('translations', function (Blueprint $table) {
-            $table->string('audio_lv')->nullable()->after('phrase_ua');
+            $table->string('audio_lv')->nullable();
         });
     }
 

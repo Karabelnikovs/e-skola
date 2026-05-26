@@ -7,9 +7,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
+        if (!Schema::hasTable('questions')) {
+            return;
+        }
+
         Schema::table('questions', function (Blueprint $table) {
-            $table->string('image')->nullable()->after('order');
-            $table->string('audio')->nullable()->after('image');
+            if (!Schema::hasColumn('questions', 'image')) {
+                $table->string('image')->nullable();
+            }
+            if (!Schema::hasColumn('questions', 'audio')) {
+                $table->string('audio')->nullable();
+            }
         });
     }
 

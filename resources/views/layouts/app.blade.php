@@ -7,7 +7,8 @@
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
     <link rel="icon" href="https://vizii.lv/urban/wp-content/uploads/sites/2/2021/09/cropped-vizii_fav-32x32.png"
         type="image/x-icon" />
-    {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
+    {{--
+    <script src="https://cdn.tailwindcss.com"></script> --}}
 
     <!-- Fonts and icons -->
     <script src="{{ asset('assets/admin/assets/js/plugin/webfont/webfont.min.js') }}"></script>
@@ -24,14 +25,15 @@
                     "Font Awesome 5 Brands",
                     "simple-line-icons",
                 ],
-                urls: [asset('assets/admin/assets/css/fonts.min.css')],
+                urls: ["{{ asset('assets/admin/assets/css/fonts.min.css') }}"],
             },
-            active: function() {
+            active: function () {
                 sessionStorage.fonts = true;
             },
         });
     </script>
-    {{-- <link rel="stylesheet"
+    {{--
+    <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.6.0/css/fontawesome.min.css"> --}}
     <!-- CSS Files -->
     <link rel="stylesheet" href="{{ asset('assets/admin/assets/css/bootstrap.min.css') }}" />
@@ -223,17 +225,19 @@
                 <div class="logo-header" data-background-color="dark">
                     <div class="navbar-brand d-flex align-items-center flex-wrap gap-2 justify-content-center">
                         @php
-                            $segments = request()->segments();
-                            $currentLocale = $segments[0] ?? 'lv';
-                            $pathWithoutLocale = implode('/', array_slice($segments, 1));
-                            $queryString = request()->getQueryString() ? '?' . request()->getQueryString() : '';
+                        $segments = request()->segments();
+                        $currentLocale = $segments[0] ?? 'lv';
+                        $pathWithoutLocale = implode('/', array_slice($segments, 1));
+                        $queryString = request()->getQueryString() ? '?' . request()->getQueryString() : '';
                         @endphp
                         @foreach (config('locale.supported') as $language)
-                            <a @if (!empty($pathWithoutLocale)) { href="/{{ $language }}/{{ $pathWithoutLocale }}{{ $queryString }}" } @else { href="/{{ $language }}" } @endif
-                                @if ($currentLocale == $language) style="font-weight: bold; color: #9810fa !important;" @else style="color: white;" @endif
-                                class="logo-app logo">
-                                {{ strtoupper($language) }}
-                            </a>
+                        <a @if (!empty($pathWithoutLocale)) {
+                            href="/{{ $language }}/{{ $pathWithoutLocale }}{{ $queryString }}" } @else {
+                            href="/{{ $language }}" } @endif @if ($currentLocale==$language)
+                            style="font-weight: bold; color: #9810fa !important;" @else style="color: white;" @endif
+                            class="logo-app logo">
+                            {{ strtoupper($language) }}
+                        </a>
                         @endforeach
                     </div>
                     <div class="nav-toggle">
@@ -264,12 +268,12 @@
                                 id="dashboard">
                                 <ul class="nav nav-collapse">
                                     @foreach ($courses as $course)
-                                        <li
-                                            class="{{ Route::currentRouteName() == $lang . '.module.show' && request()->route()->parameter('id') == $course->id ? 'active' : '' }}">
-                                            <a href="{{ route($lang . '.module.show', $course->id) }}">
-                                                <span class="sub-item">{{ $course->{'title_' . $lang} }}</span>
-                                            </a>
-                                        </li>
+                                    <li
+                                        class="{{ Route::currentRouteName() == $lang . '.module.show' && request()->route()->parameter('id') == $course->id ? 'active' : '' }}">
+                                        <a href="{{ route($lang . '.module.show', $course->id) }}">
+                                            <span class="sub-item">{{ $course->{'title_' . $lang} }}</span>
+                                        </a>
+                                    </li>
                                     @endforeach
                                 </ul>
                             </div>
@@ -293,13 +297,12 @@
                                 <p>{{ $translations[$lang]['dictionaries'] }}</p>
                             </a>
                         </li>
-                        <li
-                            class="nav-item {{ Route::currentRouteName() == $lang . '.certificates' ? 'active' : '' }}">
+                        <li class="nav-item {{ Route::currentRouteName() == $lang . '.certificates' ? 'active' : '' }}">
                             <a href="{{ route($lang . '.certificates') }}">
                                 <i class="fa-solid fa-circle-check"></i>
                                 <p>{{ $translations[$lang]['certificates'] }}</p>
                                 @if ($new_certificates > 0)
-                                    <span class="badge badge-success">{{ $new_certificates }}</span>
+                                <span class="badge badge-success">{{ $new_certificates }}</span>
                                 @endif
                             </a>
                         </li>
@@ -330,11 +333,10 @@
                             @endphp
 
                             @foreach (config('locale.supported') as $language)
-                                <a href="{{ url("/$language/$pathWithoutLocale$queryString") }}"
-                                    class="language-switcher d-flex align-items-center justify-content-center text-decoration-none 
-                  rounded-pill px-2 transition-all {{ $currentLocale == $language ? 'active' : '' }}">
-                                    <span class="fw-semibold">{{ strtoupper($language) }}</span>
-                                </a>
+                                            <a href="{{ url("/$language/$pathWithoutLocale$queryString") }}" class="language-switcher d-flex align-items-center justify-content-center text-decoration-none 
+                                  rounded-pill px-2 transition-all {{ $currentLocale == $language ? 'active' : '' }}">
+                                                <span class="fw-semibold">{{ strtoupper($language) }}</span>
+                                            </a>
                             @endforeach
                         </div>
                         {{-- <div class="nav-toggle">
@@ -495,8 +497,10 @@
     <script src="{{ asset('assets/admin/assets/js/kaiadmin.min.js') }}"></script>
 
     <!-- Kaiadmin DEMO methods, don't include it in your project! -->
-    {{-- <script src="{{ asset('assets/admin/assets/js/setting-demo.js') }}"></script> --}}
-    {{-- <script src="{{ asset('assets/admin/assets/js/demo.js') }}"></script> --}}
+    {{--
+    <script src="{{ asset('assets/admin/assets/js/setting-demo.js') }}"></script> --}}
+    {{--
+    <script src="{{ asset('assets/admin/assets/js/demo.js') }}"></script> --}}
 
 </body>
 

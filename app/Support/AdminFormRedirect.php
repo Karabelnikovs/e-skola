@@ -23,6 +23,11 @@ class AdminFormRedirect
             preg_match('#^test/update/(\d+)$#', $path, $m) => self::test((int) $m[1]),
             preg_match('#^module/update/(\d+)$#', $path, $m) => self::module((int) $m[1]),
             preg_match('#^dictionary/update/(\d+)$#', $path, $m) => self::dictionary((int) $m[1]),
+            $path === 'topics/store' => self::topicStore($request),
+            $path === 'tests/store' => redirect()->route('topics')->with('info', self::FLASH_MESSAGE),
+            $path === 'dictionary/store' => redirect()->route('topics')->with('info', self::FLASH_MESSAGE),
+            $path === 'welcome_email/store' => redirect()->route('welcome_email')->with('info', self::FLASH_MESSAGE),
+            $path === 'cookies/store' => redirect()->route('cookies')->with('info', self::FLASH_MESSAGE),
             default => null,
         };
     }
@@ -63,5 +68,15 @@ class AdminFormRedirect
         }
 
         return redirect()->route('dictionary.edit', $id)->with('info', self::FLASH_MESSAGE);
+    }
+
+    public static function topicStore(Request $request): RedirectResponse
+    {
+        $courseId = $request->query('course_id');
+        if ($courseId && DB::table('courses')->where('id', $courseId)->exists()) {
+            return redirect()->route('topic.new', $courseId)->with('info', self::FLASH_MESSAGE);
+        }
+
+        return redirect()->route('topics')->with('info', self::FLASH_MESSAGE);
     }
 }

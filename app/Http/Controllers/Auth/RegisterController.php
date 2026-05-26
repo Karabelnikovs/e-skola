@@ -14,8 +14,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\WelcomeEmail;
-use PhpParser\Node\Stmt\Switch_;
 use App\Models\PendingUser;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 class RegisterController extends Controller
 {
@@ -55,13 +55,19 @@ class RegisterController extends Controller
 
     protected function create(array $data)
     {
-        $user = User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-            'role' => 'user',
-            'language' => $data['main_lang'],
-        ]);
+        try {
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'role' => 'user',
+                'language' => $data['main_lang'],
+            ]);
+        } catch (UniqueConstraintViolationException) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'email' => __('validation.unique', ['attribute' => 'email']),
+            ]);
+        }
 
         try {
             Mail::to($user->email)->send(new WelcomeEmail($user));
