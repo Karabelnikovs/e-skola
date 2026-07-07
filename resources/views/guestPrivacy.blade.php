@@ -10,7 +10,9 @@
     {{-- <script src="https://cdn.tailwindcss.com"></script> --}}
 
     <!-- Fonts and icons -->
-    @php($adminFontsCss = asset('assets/admin/assets/css/fonts.min.css'))
+    @php
+        $adminFontsCss = asset('assets/admin/assets/css/fonts.min.css');
+    @endphp
     <script src="{{ asset('assets/admin/assets/js/plugin/webfont/webfont.min.js') }}"></script>
 
     <script>
