@@ -176,7 +176,7 @@ class TestController extends Controller
                         $issuedAt = now();
 
                         $pdf = new \setasign\Fpdi\Tcpdf\Fpdi();
-                        $templatePath = storage_path('app/public/templates/certificate_template.pdf');
+                        $templatePath = public_path('templates/certificate_template.pdf');
                         $pdf->setSourceFile(\setasign\Fpdi\PdfParser\StreamReader::createByFile($templatePath));
                         $templateId = $pdf->importPage(1);
 
